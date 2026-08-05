@@ -2,11 +2,16 @@
   lib,
   pkgs,
   inputs,
+  hostSystem,
   hostProfile ? { },
   ...
 }:
 let
-  isHeadless = hostProfile.headless or false;
+  isLinux = lib.hasSuffix "-linux" hostSystem;
+  isDarwin = lib.hasSuffix "-darwin" hostSystem;
+  # Hyprland/GTK desktop bits only apply to a Linux host with a display.
+  isHeadless = (hostProfile.headless or false) || !isLinux;
+  homeDirectory = if isDarwin then "/Users/wesbragagt" else "/home/wesbragagt";
   features = hostProfile.features or { };
   claudeCodeEnabled = features.claude-code or false;
   ompEnabled = features.omp or false;
@@ -37,7 +42,7 @@ let
     ];
 
     home.username = "wesbragagt";
-    home.homeDirectory = "/home/wesbragagt";
+    home.homeDirectory = homeDirectory;
     home.stateVersion = "25.11";
 
     programs.home-manager.enable = true;
@@ -51,10 +56,12 @@ let
     wes.omp.enable = ompEnabled;
     home.packages = [ pkgs.nssTools ];
     home.sessionVariables = lib.optionalAttrs mnemosyneEnabled {
-      MNEMOSYNE_DATA_DIR = "/home/wesbragagt/.local/share/mnemosyne";
+      MNEMOSYNE_DATA_DIR = "${homeDirectory}/.local/share/mnemosyne";
       MNEMOSYNE_BANK = "default";
     };
 
+  }
+  // lib.optionalAttrs isLinux {
     systemd.user.services.caddy-local-trust = lib.mkIf (!isHeadless) {
       Unit = {
         Description = "Import Caddy local CA into Chromium trust store";
@@ -87,7 +94,6 @@ let
       };
       Install.WantedBy = [ "graphical-session.target" ];
     };
-
   };
   desktop = {
     gtk = {

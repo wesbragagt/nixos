@@ -1,7 +1,9 @@
 {
   lib,
+  pkgs,
   repoRoot,
   config,
+  hostSystem,
   hostProfile ? { },
   ...
 }:
@@ -9,6 +11,13 @@ let
   sopsHostKeyPath = hostProfile.sopsHostKeyPath or null;
   useSystemSopsSecrets = sopsHostKeyPath != null;
   useHomeSopsSecrets = hostProfile.useHomeSopsSecrets or false;
+  isDarwin = lib.hasSuffix "-darwin" hostSystem;
+  isLinux = lib.hasSuffix "-linux" hostSystem;
+  managedHostName =
+    let
+      name = hostProfile.name or null;
+    in
+    if name == null || name == "standalone" then null else name;
   commonAliases = {
     vi = "nvim";
     sf = "file-fzf";
@@ -46,19 +55,20 @@ let
       export EXA_API_KEY="$(< "${exaApiKeyPath}")"
     fi
 
+${lib.optionalString isLinux ''
     # uv-managed venv pythons are downloaded standalone builds that don't get the
     # wrappedPython LD_LIBRARY_PATH prefix, so wheels that dlopen libstdc++ (duckdb,
     # pyarrow, ...) fail to import. Expose the nix-ld library path here so uv's
     # spawned interpreters inherit it.
     export LD_LIBRARY_PATH="/run/current-system/sw/share/nix-ld/lib''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
 
-    __nixos_flake_host() {
+''}    __flake_host() {
       local host
       host="$(hostname -s 2>/dev/null || hostname)"
       host="''${host%%.*}"
 
       if [[ -z "$host" ]]; then
-        echo "Unable to determine current hostname for NixOS rebuild" >&2
+        echo "Unable to determine current hostname for rebuild" >&2
         return 1
       fi
 
@@ -70,8 +80,8 @@ let
       action="''${1:-switch}"
 
       case "$action" in
-        boot|build|dry-build|dry-activate|switch|test)
-          if (( ''${#argv} > 0 )); then
+${if isDarwin then ''        build|check|switch)'' else ''        boot|build|dry-build|dry-activate|switch|test)''}
+          if (( $# > 0 )); then
             shift
           fi
           ;;
@@ -80,9 +90,12 @@ let
           ;;
       esac
 
-      host="$(__nixos_flake_host)" || return
+      host="${if managedHostName == null then "" else managedHostName}"
+      if [[ -z "$host" ]]; then
+        host="$(__flake_host)" || return
+      fi
       echo "Rebuilding host '$host' with action '$action'..." >&2
-      sudo nixos-rebuild "$action" --impure --flake ${repoRoot}#"$host" "$@"
+${if isDarwin then ''      darwin-rebuild "$action" --flake ${repoRoot}#"$host" "$@"'' else ''      sudo nixos-rebuild "$action" --impure --flake ${repoRoot}#"$host" "$@"''}
     }
 
     cd/() {

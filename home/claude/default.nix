@@ -10,7 +10,11 @@
 let
   hunkEnabled = hostProfile.hunkEnabled or true;
   cfg = config.wes.claudeCode;
-  claudeCodePackage = pkgs.callPackage ../../pkgs/claude-code { };
+  claudeCodePackage =
+    if pkgs.stdenv.hostPlatform.isDarwin then
+      pkgs.claude-code
+    else
+      pkgs.callPackage ../../pkgs/claude-code { };
   mkSkillLinks = import ../lib/mk-skill-links.nix { inherit lib; };
   repoSkillLinks = mkSkillLinks {
     inherit (config.lib.file) mkOutOfStoreSymlink;

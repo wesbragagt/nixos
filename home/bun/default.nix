@@ -1,7 +1,7 @@
 { lib, pkgs, ... }:
 {
   home.packages = [
-    (pkgs.callPackage ../../pkgs/bun-bin-1_3_14 { })
+    (if pkgs.stdenv.hostPlatform.isDarwin then pkgs.bun else pkgs.callPackage ../../pkgs/bun-bin-1_3_14 { })
   ];
 
   home.sessionVariables = {

@@ -8,6 +8,10 @@
       url = "github:nix-community/home-manager/release-25.11";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    darwin = {
+      url = "github:nix-darwin/nix-darwin/nix-darwin-25.11";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     zen-browser = {
       url = "github:0xc000022070/zen-browser-flake";
       inputs = {
@@ -54,6 +58,7 @@
       nixpkgs,
       nixpkgs-unstable,
       home-manager,
+      darwin,
       ...
     }@inputs:
     let
@@ -96,6 +101,28 @@
         useHomeSopsSecrets = false;
       };
 
+      homeManagerModule =
+        {
+          resolvedHostProfile,
+          hostSystem,
+        }:
+        {
+          wes.host = lib.removeAttrs resolvedHostProfile [
+            "name"
+            "useHomeSopsSecrets"
+            "features"
+            "hunkEnabled"
+          ];
+          home-manager.useGlobalPkgs = true;
+          home-manager.useUserPackages = true;
+          home-manager.backupFileExtension = "hm-bak";
+          home-manager.extraSpecialArgs = {
+            inherit inputs hostSystem;
+            hostProfile = resolvedHostProfile;
+          };
+          home-manager.users.wesbragagt = import ./home/wesbragagt.nix;
+        };
+
       mkHost =
         {
           name,
@@ -117,22 +144,38 @@
             (./hosts + "/${name}")
             inputs.sops-nix.nixosModules.sops
             home-manager.nixosModules.home-manager
-            {
-              wes.host = lib.removeAttrs resolvedHostProfile [
-                "name"
-                "useHomeSopsSecrets"
-                "features"
-                "hunkEnabled"
-              ];
-              home-manager.useGlobalPkgs = true;
-              home-manager.useUserPackages = true;
-              home-manager.backupFileExtension = "hm-bak";
-              home-manager.extraSpecialArgs = {
-                inherit inputs;
-                hostProfile = resolvedHostProfile;
-              };
-              home-manager.users.wesbragagt = import ./home/wesbragagt.nix;
-            }
+            (homeManagerModule {
+              inherit resolvedHostProfile;
+              hostSystem = system;
+            })
+          ];
+        };
+
+      mkDarwinHost =
+        {
+          name,
+          system ? "aarch64-darwin",
+          hostProfile ? { },
+        }:
+        let
+          resolvedHostProfile = (lib.recursiveUpdate defaultHostProfile hostProfile) // {
+            inherit name;
+          };
+        in
+        darwin.lib.darwinSystem {
+          inherit system;
+          specialArgs = {
+            inherit inputs;
+            hostProfile = resolvedHostProfile;
+          };
+          modules = [
+            (./hosts + "/${name}")
+            ./modules/host-profile.nix
+            home-manager.darwinModules.home-manager
+            (homeManagerModule {
+              inherit resolvedHostProfile;
+              hostSystem = system;
+            })
           ];
         };
     in
@@ -173,12 +216,21 @@
         };
       };
 
+      darwinConfigurations.macos = mkDarwinHost {
+        name = "macos";
+        hostProfile = {
+          isLaptop = true;
+          useHomeSopsSecrets = true;
+        };
+      };
+
       # Standalone home-manager for non-NixOS Linux machines.
       # Apply with: nix run home-manager/master -- switch --flake .#wesbragagt
       homeConfigurations.wesbragagt = home-manager.lib.homeManagerConfiguration {
         pkgs = nixpkgs.legacyPackages.${defaultSystem};
         extraSpecialArgs = {
           inherit inputs;
+          hostSystem = defaultSystem;
           hostProfile = defaultHostProfile // {
             name = "standalone";
             useHomeSopsSecrets = sopsHomeSecretsEnabled;
@@ -196,6 +248,7 @@
         pkgs = nixpkgs.legacyPackages.${defaultSystem};
         extraSpecialArgs = {
           inherit inputs;
+          hostSystem = defaultSystem;
           hostProfile = defaultHostProfile // {
             name = "standalone-server";
             headless = true;

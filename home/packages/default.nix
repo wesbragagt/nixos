@@ -2,13 +2,16 @@
   pkgs,
   inputs,
   lib,
+  hostSystem,
   hostProfile ? { },
   ...
 }:
 let
+  isLinux = lib.hasSuffix "-linux" hostSystem;
   isLaptop = hostProfile.isLaptop or false;
   hasWireless = hostProfile.hasWireless or false;
-  isHeadless = hostProfile.headless or false;
+  # Desktop/Wayland tooling only makes sense on a Linux host with a display.
+  isHeadless = (hostProfile.headless or false) || !isLinux;
   gamingEnabled = (hostProfile.features or { }).gaming or false;
   mnemosyneEnabled = (hostProfile.features or { }).mnemosyne or false;
   ffmpegEnabled = (hostProfile.features or { }).ffmpeg or false;
@@ -18,18 +21,22 @@ let
   };
   # Python wheels loaded via the Nix-managed interpreter use dlopen(), so they
   # need LD_LIBRARY_PATH directly; nix-ld alone only helps foreign executables.
-  wrappedPython = pkgs.symlinkJoin {
-    name = "python3-wrapped";
-    paths = [ pkgs.python3 ];
-    nativeBuildInputs = [ pkgs.makeWrapper ];
-    postBuild = ''
-      for bin in "$out"/bin/python*; do
-        if [ -f "$bin" ] && [ -x "$bin" ]; then
-          wrapProgram "$bin" --prefix LD_LIBRARY_PATH : /run/current-system/sw/share/nix-ld/lib
-        fi
-      done
-    '';
-  };
+  wrappedPython =
+    if isLinux then
+      pkgs.symlinkJoin {
+        name = "python3-wrapped";
+        paths = [ pkgs.python3 ];
+        nativeBuildInputs = [ pkgs.makeWrapper ];
+        postBuild = ''
+          for bin in "$out"/bin/python*; do
+            if [ -f "$bin" ] && [ -x "$bin" ]; then
+              wrapProgram "$bin" --prefix LD_LIBRARY_PATH : /run/current-system/sw/share/nix-ld/lib
+            fi
+          done
+        '';
+      }
+    else
+      pkgs.python3;
   clipboardSelector = pkgs.writeShellScriptBin "clipboard-selector" ''
     set -euo pipefail
 
@@ -109,9 +116,8 @@ in
     with pkgs;
     [
       # cli tools
-      inputs.exacli.packages.${pkgs.stdenv.hostPlatform.system}.default
+      inputs.exacli.packages.${hostSystem}.default
       gh
-      (pkgs.callPackage ../../pkgs/tuicr { })
       jq
       yq-go
       go
@@ -123,7 +129,6 @@ in
       stow
       unzip
       tldr
-      libnotify
       (
         (pkgs.callPackage "${inputs.nur-combined}/repos/sikmir/pkgs/by-name/re/revdiff/package.nix" {
           buildGoModule = pkgs.buildGo126Module;
@@ -132,15 +137,11 @@ in
           allowGoReference = true;
         })
       )
-      (pkgs.callPackage ../../pkgs/agent-browser { })
       (pkgs.callPackage ../../pkgs/excalidraw-cli { })
-
-      # secrets / auth
-      libsecret
+      (pkgs.callPackage ../../pkgs/pi-coding-agent { })
 
       # data
       csvlens # interactive CSV viewer
-      (pkgs.callPackage ../../pkgs/duckdb-bin-1_5_3 { }) # in-process analytical SQL
       harlequin # terminal database UI
 
       # git
@@ -157,6 +158,14 @@ in
       (pkgs.writeShellScriptBin "grep-fzf" (builtins.readFile ../../scripts/sg.sh))
       (pkgs.writeShellScriptBin "agent-notify" (builtins.readFile ../../scripts/agent-notify.sh))
       (pkgs.writeShellScriptBin "omp-prewalk" (builtins.readFile ../../scripts/omp-prewalk.sh))
+    ]
+    ++ lib.optionals isLinux [
+      # linux-only cli tools (nix-ld / x86_64 binaries / linux-specific packaging)
+      (pkgs.callPackage ../../pkgs/tuicr { })
+      libnotify
+      libsecret
+      (pkgs.callPackage ../../pkgs/agent-browser { })
+      (pkgs.callPackage ../../pkgs/duckdb-bin-1_5_3 { }) # in-process analytical SQL
       (pkgs.callPackage ../../pkgs/workmux { })
     ]
     ++ lib.optionals (!isHeadless) [
@@ -213,7 +222,7 @@ in
       networkmanagerapplet
       iwgtk
     ]
-    ++ lib.optionals isLaptop [
+    ++ lib.optionals (isLinux && isLaptop) [
       (pkgs.writeShellScriptBin "battery-estimate" (builtins.readFile ../../scripts/battery-estimate.sh))
     ]
     ++ lib.optionals (gamingEnabled && !isHeadless) [

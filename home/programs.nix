@@ -1,5 +1,11 @@
-{ lib, hostProfile ? { }, ... }:
+{
+  lib,
+  hostSystem,
+  hostProfile ? { },
+  ...
+}:
 let
+  isLinux = lib.hasSuffix "-linux" hostSystem;
   isHeadless = hostProfile.headless or false;
 in
 {
@@ -12,7 +18,7 @@ in
     ./ssh
     ./yazi
   ]
-  ++ lib.optionals (!isHeadless) [
+  ++ lib.optionals (isLinux && !isHeadless) [
     ./apps
   ];
 }
