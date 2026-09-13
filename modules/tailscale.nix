@@ -6,6 +6,12 @@
   # available when the Tailscale DNS proxy is temporarily unavailable.
   networking.networkmanager.dns = "systemd-resolved";
 
+  # NetworkManager claimed tailscale0 as an external device and removed the
+  # 100.x address that tailscaled had set. The interface kept its routes but
+  # sent packets with the LAN source address, so every tailnet host timed out.
+  # Keep tailscale0 out of NetworkManager so only tailscaled owns it.
+  networking.networkmanager.unmanaged = [ "interface-name:tailscale0" ];
+
   services.resolved = {
     enable = true;
     fallbackDns = [
