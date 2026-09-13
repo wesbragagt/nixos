@@ -61,9 +61,6 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    # Route Claude Code through the shared ccflare endpoint (home/ccflare/config.yml).
-    home.sessionVariables = {};
-
     home.packages = [ cfg.package ];
 
     home.file = {

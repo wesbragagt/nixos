@@ -109,8 +109,6 @@ Apply the change with `rebuild build` followed by `rebuild`.
 The `home/ccflare` module reads this file at evaluation time and exposes
 `config.wes.ccflare.baseUrl`, `apiKey`, and `models`.
 
-- `home/claude/default.nix` sets `ANTHROPIC_BASE_URL` and `ANTHROPIC_API_KEY`
-  from these values.
 - `home/omp/default.nix` generates `~/.omp/agent/models.yml` from these
   values, in the provider format OMP expects.
 
