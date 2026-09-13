@@ -24,10 +24,6 @@
       name = "Personal";
       bookmarks = [
         {
-          name = "Spotify";
-          url = "https://open.spotify.com/";
-        }
-        {
           name = "YouTube";
           url = "https://www.youtube.com/";
         }

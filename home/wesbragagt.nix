@@ -124,19 +124,9 @@ let
         in
         [
           {
-            name = "Spotify";
-            url = "https://open.spotify.com";
-            icon = papirusIcon "com.spotify.Client";
-          }
-          {
             name = "Excalidraw";
             url = "https://excalidraw.com";
             icon = papirusIcon "excalidraw";
-          }
-          {
-            name = "TIDAL";
-            url = "https://listen.tidal.com";
-            icon = papirusIcon "tidal";
           }
           {
             name = "Roam";
