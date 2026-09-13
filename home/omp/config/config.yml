@@ -35,8 +35,10 @@ disabledExtensions:
   - slash-command:pr
   - slash-command:pr-feedback
   - slash-command:rebase
+read:
+  renderMarkdown: true
 display:
-  hideToolActivity: true
+  hideToolActivity: false
 hideThinkingBlock: true
 tools:
   artifactSpillThreshold: 20
@@ -46,3 +48,7 @@ tools:
   outputMaxColumns: 200
 composer:
   shape: box
+secrets:
+  enabled: true
+memory:
+  backend: "off"
