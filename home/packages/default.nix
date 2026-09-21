@@ -138,7 +138,7 @@ in
         })
       )
       (pkgs.callPackage ../../pkgs/excalidraw-cli { })
-      (pkgs.callPackage ../../pkgs/pi-coding-agent { bun-bin-1_3_14 = pkgs.callPackage ../../pkgs/bun-bin-1_3_14 { }; })
+      (pkgs.callPackage ../../pkgs/pi-coding-agent { bun-bin-1_4_2 = pkgs.callPackage ../../pkgs/bun-bin-1_4_2 { }; })
 
       # data
       csvlens # interactive CSV viewer

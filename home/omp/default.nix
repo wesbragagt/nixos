@@ -2,7 +2,7 @@
 let
   cfg = config.wes.omp;
   ompPkg = pkgs.callPackage ../../pkgs/pi-coding-agent {
-    bun-bin-1_3_14 = pkgs.callPackage ../../pkgs/bun-bin-1_3_14 { };
+    bun-bin-1_4_2 = pkgs.callPackage ../../pkgs/bun-bin-1_4_2 { };
   };
 
   mkSkillLinks = import ../lib/mk-skill-links.nix { inherit lib; };

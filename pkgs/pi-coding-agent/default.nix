@@ -4,7 +4,7 @@
   fetchzip,
   runtimeShell,
   jq,
-  bun-bin-1_3_14,
+  bun-bin-1_4_2,
 }:
 buildNpmPackage (finalAttrs: {
   pname = "pi-coding-agent";
@@ -37,7 +37,7 @@ buildNpmPackage (finalAttrs: {
     mkdir -p $out/bin
     cat > $out/bin/omp <<EOF
 #!${runtimeShell}
-exec "${lib.getExe bun-bin-1_3_14}" "$out/lib/node_modules/@oh-my-pi/pi-coding-agent/dist/cli.js" "\$@"
+exec "${lib.getExe bun-bin-1_4_2}" "$out/lib/node_modules/@oh-my-pi/pi-coding-agent/dist/cli.js" "\$@"
 EOF
     chmod +x $out/bin/omp
     runHook postInstall
