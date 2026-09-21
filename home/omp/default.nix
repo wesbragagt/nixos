@@ -1,7 +1,9 @@
 { lib, pkgs, config, repoRoot, ... }:
 let
   cfg = config.wes.omp;
-  bunPkg = pkgs.callPackage ../../pkgs/bun-bin-1_3_14 { };
+  ompPkg = pkgs.callPackage ../../pkgs/pi-coding-agent {
+    bun-bin-1_3_14 = pkgs.callPackage ../../pkgs/bun-bin-1_3_14 { };
+  };
 
   mkSkillLinks = import ../lib/mk-skill-links.nix { inherit lib; };
   repoSkillLinks = mkSkillLinks {
@@ -74,21 +76,11 @@ in
       default = "${repoRoot}/home/skills";
       description = "Shared skills source root, linked into ~/.omp/agent/skills.";
     };
-
-    packageName = lib.mkOption {
-      type = lib.types.str;
-      default = "@oh-my-pi/pi-coding-agent";
-      description = "npm package providing the omp CLI (installed via bun global).";
-    };
-
-    version = lib.mkOption {
-      type = lib.types.str;
-      default = "18.1.6";
-      description = "Pinned omp CLI version installed into the bun global prefix.";
-    };
   };
 
   config = lib.mkIf cfg.enable {
+
+    home.packages = [ ompPkg ];
 
     home.file = {
       ".omp/agent/config.yml".source =
@@ -113,21 +105,6 @@ in
           $DRY_RUN_CMD rm -f "$target"
         fi
       done
-    '';
-
-    home.activation.installPinnedOmp = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-      export BUN_INSTALL="$HOME/.bun"
-      export PATH="${bunPkg}/bin:$BUN_INSTALL/bin:$PATH"
-      $DRY_RUN_CMD mkdir -p "$BUN_INSTALL/bin"
-
-      current=""
-      if [ -x "$BUN_INSTALL/bin/omp" ]; then
-        current="$("$BUN_INSTALL/bin/omp" --version 2>/dev/null | sed 's#^omp/##')"
-      fi
-
-      if [ "$current" != "${cfg.version}" ]; then
-        $DRY_RUN_CMD ${bunPkg}/bin/bun install -g "${cfg.packageName}@${cfg.version}"
-      fi
     '';
   };
 }

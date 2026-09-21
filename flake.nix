@@ -219,6 +219,11 @@
       darwinConfigurations.macos = mkDarwinHost {
         name = "macos";
         hostProfile = {
+          # /etc/nixos/features.yaml is a NixOS path, so darwin hosts declare features here.
+          features = {
+            claude-code = true;
+            omp = true;
+          };
           isLaptop = true;
           useHomeSopsSecrets = true;
         };

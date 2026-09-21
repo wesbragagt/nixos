@@ -95,7 +95,7 @@ ${if isDarwin then ''        build|check|switch)'' else ''        boot|build|dry
         host="$(__flake_host)" || return
       fi
       echo "Rebuilding host '$host' with action '$action'..." >&2
-${if isDarwin then ''      darwin-rebuild "$action" --flake ${repoRoot}#"$host" "$@"'' else ''      sudo nixos-rebuild "$action" --impure --flake ${repoRoot}#"$host" "$@"''}
+${if isDarwin then ''      darwin-rebuild "$action" --impure --flake ${repoRoot}#"$host" "$@"'' else ''      sudo nixos-rebuild "$action" --impure --flake ${repoRoot}#"$host" "$@"''}
     }
 
     cd/() {

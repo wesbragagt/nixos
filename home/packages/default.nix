@@ -138,7 +138,7 @@ in
         })
       )
       (pkgs.callPackage ../../pkgs/excalidraw-cli { })
-      (pkgs.callPackage ../../pkgs/pi-coding-agent { })
+      (pkgs.callPackage ../../pkgs/pi-coding-agent { bun-bin-1_3_14 = pkgs.callPackage ../../pkgs/bun-bin-1_3_14 { }; })
 
       # data
       csvlens # interactive CSV viewer
@@ -158,6 +158,7 @@ in
       (pkgs.writeShellScriptBin "grep-fzf" (builtins.readFile ../../scripts/sg.sh))
       (pkgs.writeShellScriptBin "agent-notify" (builtins.readFile ../../scripts/agent-notify.sh))
       (pkgs.writeShellScriptBin "omp-prewalk" (builtins.readFile ../../scripts/omp-prewalk.sh))
+      (pkgs.callPackage ../../pkgs/workmux { })
     ]
     ++ lib.optionals isLinux [
       # linux-only cli tools (nix-ld / x86_64 binaries / linux-specific packaging)
@@ -166,7 +167,6 @@ in
       libsecret
       (pkgs.callPackage ../../pkgs/agent-browser { })
       (pkgs.callPackage ../../pkgs/duckdb-bin-1_5_3 { }) # in-process analytical SQL
-      (pkgs.callPackage ../../pkgs/workmux { })
     ]
     ++ lib.optionals (!isHeadless) [
       # wayland / audio
