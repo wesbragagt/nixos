@@ -88,8 +88,8 @@ in
       ".omp/agent/models.yml".source = modelsFile;
       ".omp/agent/AGENTS.md".source =
         config.lib.file.mkOutOfStoreSymlink "${cfg.configRoot}/AGENTS.md";
-      ".omp/agent/rules/notai.md".source =
-        config.lib.file.mkOutOfStoreSymlink "${cfg.configRoot}/rules/notai.md";
+      ".omp/agent/rules/communication.md".source =
+        config.lib.file.mkOutOfStoreSymlink "${cfg.configRoot}/rules/communication.md";
     }
     // agentsLink
     // verifierAgentLink
