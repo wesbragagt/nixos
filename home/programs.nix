@@ -12,6 +12,7 @@ in
   imports = [
     ./packages
     ./npm
+    ./playwright
     ./bun
     ./shell
     ./git

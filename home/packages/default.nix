@@ -15,6 +15,9 @@ let
   gamingEnabled = (hostProfile.features or { }).gaming or false;
   mnemosyneEnabled = (hostProfile.features or { }).mnemosyne or false;
   ffmpegEnabled = (hostProfile.features or { }).ffmpeg or false;
+  piCodingAgentEnabled = (hostProfile.features or { }).pi-coding-agent or false;
+  codexEnabled = (hostProfile.features or { }).codex or true;
+  t3codeEnabled = (hostProfile.features or { }).t3code or true;
   unstable = import inputs.nixpkgs-unstable {
     inherit (pkgs.stdenv.hostPlatform) system;
     config.allowUnfree = true;
@@ -138,7 +141,9 @@ in
         })
       )
       (pkgs.callPackage ../../pkgs/excalidraw-cli { })
-      (pkgs.callPackage ../../pkgs/pi-coding-agent { bun-bin-1_4_2 = pkgs.callPackage ../../pkgs/bun-bin-1_4_2 { }; })
+
+      # secrets / auth
+      libsecret
 
       # data
       csvlens # interactive CSV viewer
@@ -186,11 +191,13 @@ in
       bitwarden-desktop
 
       # desktop / ui
+      chromium
       gtk3
       nwg-dock-hyprland
       rofi-calc
       waypaper
       swww
+      blueman
       slack
       unstable.signal-desktop
       libreoffice-fresh
@@ -236,5 +243,31 @@ in
     ]
     ++ lib.optionals ffmpegEnabled [
       ffmpeg
+    ]
+    ++ lib.optionals piCodingAgentEnabled [
+      (pkgs.callPackage ../../pkgs/pi-coding-agent { bun-bin-1_4_2 = pkgs.callPackage ../../pkgs/bun-bin-1_4_2 { }; })
+    ]
+    ++ lib.optionals codexEnabled [
+      unstable.codex
+    ]
+    ++ lib.optionals t3codeEnabled [
+      (unstable.symlinkJoin {
+        name = "t3code";
+        paths = [
+          (unstable.callPackage ../../pkgs/t3code {
+            t3codeSrc = inputs.t3code-src;
+          })
+        ];
+        nativeBuildInputs = [ unstable.makeBinaryWrapper ];
+        postBuild = ''
+          for program in "$out/bin"/*; do
+            wrapProgram "$program" --prefix PATH : "${unstable.lib.makeBinPath [
+              (pkgs.callPackage ../../pkgs/claude-code { })
+              unstable.codex
+            ]}"
+          done
+        '';
+      })
     ];
+
 }

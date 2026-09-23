@@ -38,7 +38,6 @@ let
       ./zen
       ./swaync.nix
       inputs.zen-browser.homeModules.beta
-      inputs.chromium-webapps.homeManagerModules.default
     ];
 
     home.username = "wesbragagt";
@@ -116,28 +115,78 @@ let
       x11.enable = true;
     };
 
-    programs.chromium-webapps = {
-      enable = true;
-      webApps =
+    home.packages =
+      let
+        mkChromiumWebApp = {
+          name,
+          url,
+          port,
+          startupWMClass,
+          icon,
+        }:
         let
-          papirusIcon = name: "${pkgs.papirus-icon-theme}/share/icons/Papirus/64x64/apps/${name}.svg";
+          chromium = pkgs.chromium.override {
+            commandLineArgs = "--remote-debugging-port=${toString port}";
+          };
+          launcher = pkgs.writeShellScriptBin "${name}-webapp" ''
+            exec ${chromium}/bin/chromium \
+              --window-name="${name}" \
+              --app=${url} \
+              --user-data-dir="$HOME/.config/chromium-webapps/${name}" \
+              --no-default-browser-check \
+              --disable-features=GlobalShortcutsPortal
+          '';
         in
-        [
-          {
-            name = "Excalidraw";
-            url = "https://excalidraw.com";
-            icon = papirusIcon "excalidraw";
-          }
-          {
-            name = "Roam";
-            url = "https://ro.am";
-          }
-          {
-            name = "CCFlare";
-            url = "https://ccflare.dory-pentatonic.ts.net";
-          }
-        ];
-    };
+        {
+          package = launcher;
+          desktopEntry = pkgs.makeDesktopItem {
+            inherit name;
+            desktopName = name;
+            exec = "${launcher}/bin/${name}-webapp";
+            categories = [ "Network" "WebBrowser" ];
+            inherit startupWMClass;
+            inherit icon;
+          };
+        };
+        excalidraw = mkChromiumWebApp {
+          name = "Excalidraw";
+          url = "https://excalidraw.com";
+          port = 9223;
+          startupWMClass = "chrome-excalidraw.com__-Default";
+          icon = "${pkgs.papirus-icon-theme}/share/icons/Papirus/64x64/apps/excalidraw.svg";
+        };
+        roam = mkChromiumWebApp {
+          name = "Roam";
+          url = "https://ro.am";
+          port = 9224;
+          startupWMClass = "chrome-ro.am__-Default";
+          icon = "chromium";
+        };
+        whatsapp = mkChromiumWebApp {
+          name = "WhatsApp";
+          url = "https://web.whatsapp.com";
+          port = 9225;
+          startupWMClass = "chrome-web.whatsapp.com__-Default";
+          icon = "chromium";
+        };
+        discord = mkChromiumWebApp {
+          name = "Discord";
+          url = "https://discord.com/app";
+          port = 9226;
+          startupWMClass = "chrome-discord.com__app-Default";
+          icon = "chromium";
+        };
+      in
+      [
+        excalidraw.package
+        excalidraw.desktopEntry
+        roam.package
+        roam.desktopEntry
+        whatsapp.package
+        whatsapp.desktopEntry
+        discord.package
+        discord.desktopEntry
+      ];
   };
 in
 if isHeadless then base else lib.recursiveUpdate base desktop

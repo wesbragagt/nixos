@@ -157,6 +157,7 @@ ${kbOptionsLine}      repeat_delay = 250
     exec-once = wl-paste --watch cliphist store
 ${wirelessAutostartLine}    exec-once = nwg-dock-hyprland -p bottom -lp end -i 36 -c rofi-freq -r
     exec-once = swaync
+    exec-once = blueman-applet
     exec-once = swww-daemon
 
     monitor = ${monitorConfig}

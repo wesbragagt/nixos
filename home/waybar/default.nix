@@ -26,6 +26,7 @@ let
     "modules-right" = [
       "mpris"
       "pulseaudio"
+      "bluetooth"
       "custom/idle"
     ]
     ++ lib.optionals isLaptop [ "custom/battery" ]
@@ -121,6 +122,17 @@ let
       on-click = "pavucontrol";
     };
 
+    bluetooth = {
+      format = "";
+      "format-disabled" = "";
+      "format-connected" = " {device_alias}";
+      "format-connected-battery" = " {device_alias} {device_battery_percentage}%";
+      "tooltip-format" = "{controller_alias}\t{controller_address}";
+      "tooltip-format-connected" = "{controller_alias}\t{controller_address}\n\n{device_enumerate}";
+      "tooltip-format-enumerate-connected" = "{device_alias}\t{device_address}";
+      on-click = "blueman-manager";
+    };
+
     "custom/battery" = {
       exec = "battery-estimate";
       interval = 15;
@@ -162,6 +174,7 @@ let
     #disk,
     #network,
     #pulseaudio,
+    #bluetooth,
     #custom-battery,
     #custom-notifications,
     #custom-idle,
@@ -209,6 +222,8 @@ let
     }
 
     #network.disconnected { color: #f38ba8; }
+    #bluetooth.disabled { color: #6c7086; }
+    #bluetooth.connected { color: #89b4fa; }
     #pulseaudio.muted { color: #6c7086; }
     #custom-battery.warning { color: #f9e2af; }
     #custom-battery.critical { color: #f38ba8; }

@@ -17,7 +17,7 @@ let
     else
       {
         name = "linux-x64";
-        hash = "sha256-NjaPrvdSeHXV/6UuU81IAhdB8qg+tiCKjdZAaNQiqRM=";
+        hash = "sha256-M3LpjR+IBVITGPRQozVDlbkZqETUvGugQ4DCgIif9qw=";
         binPath = "bun-linux-x64/bun";
       };
 in

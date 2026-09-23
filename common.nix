@@ -8,6 +8,7 @@
 
 let
   isHeadless = hostProfile.headless or false;
+  gamingEnabled = (hostProfile.features or { }).gaming or false;
   rebuild = pkgs.writeShellScriptBin "rebuild" ''
     set -euo pipefail
 
@@ -111,7 +112,10 @@ in
   nixpkgs.config.allowUnfree = true;
   nixpkgs.overlays = [
     (final: prev: {
-      chromium = prev.chromium.override { enableWideVine = true; };
+      chromium = prev.chromium.override {
+        enableWideVine = true;
+        commandLineArgs = "--remote-debugging-port=9222";
+      };
     })
   ];
 
@@ -130,6 +134,12 @@ in
     cacert
     rebuild
   ];
+
+  programs.steam = lib.mkIf (gamingEnabled && !isHeadless) {
+    enable = true;
+    extraCompatPackages = [ pkgs.proton-ge-bin ];
+    protontricks.enable = true;
+  };
 
   # Provide common shared libraries for foreign binaries and Python wheels that
   # dlopen C/C++ dependencies (for example Arrow/Parquet wheels requiring

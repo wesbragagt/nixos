@@ -27,7 +27,12 @@ buildNpmPackage (finalAttrs: {
   '';
 
   nativeBuildInputs = [ jq ];
-  npmFlags = [ "--omit=dev" ];
+  # onnxruntime-node's postinstall downloads from api.nuget.org, which the
+  # sandbox blocks. The CLI runs prebuilt dist/cli.js, so scripts are not needed.
+  npmFlags = [
+    "--omit=dev"
+    "--ignore-scripts"
+  ];
   dontNpmBuild = true;
 
   installPhase = ''

@@ -35,6 +35,11 @@
       url = "github:tobi/qmd";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
+    t3code-src = {
+      # Change this pointer to build a personal fork.
+      url = "github:pingdotgg/t3code/v0.0.40";
+      flake = false;
+    };
     chromium-webapps = {
       url = "github:chobbledotcom/nix-chromium-webapps";
     };
@@ -78,8 +83,17 @@
         qbittorrent = false;
         mnemosyne = false;
         ffmpeg = false;
+        # Coding agents ship on every host; set "<name>: false" in
+        # /etc/nixos/features.yaml to opt a host out.
+        # Off by default: the upstream npm postinstall downloads from
+        # api.nuget.org, which the Nix build sandbox blocks.
+        pi-coding-agent = false;
+        codex = true;
+        t3code = true;
       };
-      machineFeatures = lib.mapAttrs (name: _: featureEnabled name) defaultFeatures;
+      machineFeatures = lib.mapAttrs (
+        name: default: if default then !(featureDisabled name) else featureEnabled name
+      ) defaultFeatures;
       # sops defaults on (existing behaviour); set "sops: false" in
       # /etc/nixos/features.yaml to opt a headless/no-yubikey box out of it.
       sopsHomeSecretsEnabled = !(featureDisabled "sops");

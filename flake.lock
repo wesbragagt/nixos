@@ -248,11 +248,11 @@
     },
     "nixpkgs-unstable": {
       "locked": {
-        "lastModified": 1785318670,
-        "narHash": "sha256-dN6Ou5x/+23FZLEpYP3IffO+NyJFzUlGumt1uu3MMaY=",
+        "lastModified": 1789684949,
+        "narHash": "sha256-ZKhUe/2IJUq1JhKxKMu8rbkgSGmPP2ZCqlIPn40aGCM=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "0954f7ee2f6bb3dc7d4e3d0d8bcb8fd4bde4cfc5",
+        "rev": "e554fab72f81915600f3f449b786fd9af40439a5",
         "type": "github"
       },
       "original": {
@@ -312,6 +312,7 @@
         "nur-combined": "nur-combined",
         "qmd": "qmd",
         "sops-nix": "sops-nix",
+        "t3code-src": "t3code-src",
         "tokyo-night-yazi": "tokyo-night-yazi",
         "zen-browser": "zen-browser"
       }
@@ -378,6 +379,23 @@
       "original": {
         "owner": "nix-systems",
         "repo": "default",
+        "type": "github"
+      }
+    },
+    "t3code-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1788821484,
+        "narHash": "sha256-J8kXpfMfm03/DDAiWXJuANwUNDshhiUn7Lf9tV42Xfw=",
+        "owner": "pingdotgg",
+        "repo": "t3code",
+        "rev": "09e8de9c655ae85410bf6b00446f272a01da81c7",
+        "type": "github"
+      },
+      "original": {
+        "owner": "pingdotgg",
+        "ref": "v0.0.40",
+        "repo": "t3code",
         "type": "github"
       }
     },

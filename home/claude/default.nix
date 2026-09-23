@@ -14,7 +14,7 @@ let
     inherit (pkgs.stdenv) system;
     config.allowUnfree = true;
   };
-  claudeCodePackage = unstable.claude-code;
+  claudeCodePackage = unstable.callPackage ../../pkgs/claude-code { };
   mkSkillLinks = import ../lib/mk-skill-links.nix { inherit lib; };
   repoSkillLinks = mkSkillLinks {
     inherit (config.lib.file) mkOutOfStoreSymlink;
@@ -89,10 +89,10 @@ in
       $DRY_RUN_CMD mkdir -p "$HOME/.claude"
       if [ -f "$settings" ]; then
         $DRY_RUN_CMD ${pkgs.jq}/bin/jq \
-          '.outputStyle = "ASD-STE100" | .permissions.deny = ((.permissions.deny // []) + ["WebSearch"] | unique)' \
+          '.outputStyle = "ASD-STE100" | .env.ENABLE_CLAUDEAI_MCP_SERVERS = "false" | .permissions.deny = ((.permissions.deny // []) + ["WebSearch"] | unique)' \
           "$settings" > "$tmp"
       else
-        $DRY_RUN_CMD printf '%s\n' '{"outputStyle":"ASD-STE100","permissions":{"deny":["WebSearch"]}}' > "$tmp"
+        $DRY_RUN_CMD printf '%s\n' '{"outputStyle":"ASD-STE100","env":{"ENABLE_CLAUDEAI_MCP_SERVERS":"false"},"permissions":{"deny":["WebSearch"]}}' > "$tmp"
       fi
       $DRY_RUN_CMD mv "$tmp" "$settings"
     '';
