@@ -43,6 +43,7 @@ in
     ./modules/containers.nix
     ./modules/sops.nix
     ./modules/responsiveness.nix
+    ./modules/cron.nix
   ]
   ++ lib.optionals (!isHeadless) [
     ./modules/graphics.nix

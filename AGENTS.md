@@ -91,6 +91,25 @@ Follow `docs/add-another-machine.md` for the full multi-host + secrets workflow.
 - Session variables and PATH wiring live in `home/npm/default.nix`
 - Keep npm global prefix setup there instead of duplicating it in shell modules
 
+### Schedule a cron job
+
+Use the `schedules` CLI. It takes effect at once. Do **not** run `rebuild` for a job.
+
+```bash
+schedules add <name> --schedule "0 3 * * *" --command "./scripts/sync.sh" --cwd /path/to/project
+schedules run <name>      # run it now, with the same environment cron uses
+schedules logs <name>     # read collected output
+schedules list            # every job
+schedules remove <name>
+```
+
+- Always verify with `schedules run <name>` before you report the job as done.
+- `--schedule` takes the 5 standard cron fields. `--cwd` defaults to the current directory.
+- Add `--tmux` to run the job as a window named `<name>` in the shared `schedules` tmux session. Attach with `tmux attach -t schedules`.
+- Jobs live in `~/.local/state/schedules/jobs/`. Logs live in `~/.local/state/schedules/logs/`.
+- The CLI owns a marked block in the user crontab. Hand-written crontab lines are kept.
+- Source: `home/schedules/schedules.py`. `modules/cron.nix` enables cron and user linger.
+
 ### Use flake inputs in `home/`
 
 - Ensure module args include `inputs`:

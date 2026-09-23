@@ -17,6 +17,7 @@ in
     ./git
     ./ssh
     ./yazi
+    ./schedules
   ]
   ++ lib.optionals (isLinux && !isHeadless) [
     ./apps
