@@ -37,12 +37,15 @@ in
   systemd.services.t3code-server = {
     description = "T3 Code server (tailnet-reachable control surface)";
     wantedBy = [ "multi-user.target" ];
-    after = [ "network-online.target" "tailscaled.service" ];
+    after = [ "network-online.target" "tailscaled.service" "sops-nix.service" ];
     wants = [ "network-online.target" ];
     serviceConfig = {
       Type = "simple";
       User = "wesbragagt";
-      ExecStart = "${t3code}/bin/t3 serve --host 0.0.0.0 --port 3773";
+      ExecStart = "${pkgs.writeShellScript "t3code-server-start" ''
+        export EXA_API_KEY="$(cat /run/secrets/exa_api_key)"
+        exec ${t3code}/bin/t3 serve --host 0.0.0.0 --port 3773
+      ''}";
       Restart = "on-failure";
       RestartSec = 5;
     };
