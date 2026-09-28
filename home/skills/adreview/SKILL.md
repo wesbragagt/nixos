@@ -1,7 +1,7 @@
 ---
 name: adreview
 description: Run an adversarial review dialogue with the sibling agent in the same workmux session. Claude uses OMP; OMP uses Claude Code. Use when the user requests an adversarial review or invokes /adreview.
-argument-hint: "[optional review target, question, files, branch, or diff]"
+argument-hint: "[optional review target, question, files, branch, or diff] [--reviewer=claude|omp]"
 ---
 
 # Adversarial sibling review
@@ -10,18 +10,31 @@ Use the other agent in the current workmux session as an external adversarial re
 
 ## Select the reviewer
 
-Resolve the current tmux session and window:
+Extract any explicit `--reviewer=claude` or `--reviewer=omp` flag from the arguments. If a flag is present, use it as the reviewer and strip it from the arguments to prevent it from leaking into the review prompt. Otherwise, auto-detect the reviewer from the current tmux window.
 
 ```bash
+# Get the session
 session=$(tmux display-message -p -t "$TMUX_PANE" '#S')
-window=$(tmux display-message -p -t "$TMUX_PANE" '#W')
+
+# Check for explicit reviewer flag
+if [[ "$ARGUMENTS" =~ --reviewer=(claude|omp) ]]; then
+  reviewer="${BASH_REMATCH[1]}"
+  # Strip the flag from ARGUMENTS
+  ARGUMENTS=$(echo "$ARGUMENTS" | sed 's/ *--reviewer=[^ ]*//')
+else
+  # Auto-detect from window
+  window=$(tmux display-message -p -t "$TMUX_PANE" '#W')
+  
+  if [[ "$window" == "claude" ]]; then
+    reviewer=omp
+  elif [[ "$window" == "omp" ]]; then
+    reviewer=claude
+  else
+    echo "Error: /adreview requires the 'claude' or 'omp' workmux window or explicit --reviewer flag." >&2
+    exit 1
+  fi
+fi
 ```
-
-Select exactly one sibling:
-
-- When `window` is `claude`, set `reviewer=omp`.
-- When `window` is `omp`, set `reviewer=claude`.
-- For any other window, report that `/adreview` requires the `claude` or `omp` workmux window and stop.
 
 Set `target="${session}:${reviewer}"`. Confirm that target exists before sending input. Do not select a window from another session.
 

@@ -1,0 +1,45 @@
+html, body, #root { margin: 0; height: 100%; font-family: system-ui, sans-serif; }
+
+/* Node boxes */
+.react-flow__node-default,
+.react-flow__node-input,
+.react-flow__node-output { border-radius: 6px; font-size: 13px; }
+
+/* Start nodes (no incoming edges) */
+.react-flow__node-input { background: #e6f4ea; border-color: #2e7d32; }
+
+/* End nodes (no outgoing edges) */
+.react-flow__node-output { background: #fdecea; border-color: #c62828; }
+
+/* Branch nodes (more than one outgoing edge) */
+.react-flow__node.decision { background: #fff7e0; border-color: #d4a017; }
+
+/* Node text */
+.node-label { font-weight: bold; display: block; }
+.node-description { font-size: 11px; color: #666; display: block; margin-top: 4px; }
+
+/* Edge labels (branch conditions such as yes/no) */
+.react-flow__edge-textbg { fill: #fff; }
+
+/* Nodes with a detailFile open the detail panel on click */
+.react-flow__node.has-detail { cursor: pointer; }
+
+/* Detail panel (Markdown from a node's detailFile) */
+.detail-panel {
+  position: fixed; top: 0; right: 0; bottom: 0; z-index: 10;
+  width: min(420px, 90vw); overflow-y: auto; box-sizing: border-box;
+  padding: 20px 24px; background: #fff; border-left: 1px solid #ddd;
+  box-shadow: -4px 0 16px rgba(0, 0, 0, 0.12); font-size: 14px; line-height: 1.5; color: #222;
+}
+.detail-close {
+  position: absolute; top: 10px; right: 12px; border: none; background: none;
+  font-size: 22px; line-height: 1; color: #666; cursor: pointer;
+}
+.detail-close:hover { color: #000; }
+.detail-title { font-size: 12px; font-weight: normal; text-transform: uppercase; letter-spacing: 0.05em; color: #888; margin: 0 0 8px; }
+.detail-body h2 { font-size: 18px; margin: 0 0 12px; }
+.detail-body h3 { font-size: 15px; margin: 16px 0 8px; }
+.detail-body code { font-family: ui-monospace, monospace; font-size: 12px; background: #f3f3f3; padding: 1px 4px; border-radius: 3px; }
+.detail-body table { border-collapse: collapse; font-size: 13px; margin: 8px 0; }
+.detail-body th, .detail-body td { border: 1px solid #ddd; padding: 4px 8px; text-align: left; }
+.detail-error { color: #c62828; }

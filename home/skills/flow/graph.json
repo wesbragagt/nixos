@@ -1,0 +1,22 @@
+{
+  "nodes": [
+    {"id": "start", "label": "Start", "description": "Every change begins from a known, working system generation", "detailFile": "details/start.md"},
+    {"id": "edit", "label": "Edit config files", "description": "Configuration changes define the desired system state", "detailFile": "details/edit.md"},
+    {"id": "stage", "label": "Stage changes", "description": "Only git-tracked files are visible to the nix flake", "detailFile": "details/stage.md"},
+    {"id": "rebuild", "label": "Run rebuild", "description": "Evaluates staged config and builds the new generation", "detailFile": "details/rebuild.md"},
+    {"id": "check", "label": "Build succeeds?", "description": "A failed build never activates, so the running system stays safe", "detailFile": "details/check.md"},
+    {"id": "done", "label": "Done", "description": "The new generation is active and can be rolled back if needed", "detailFile": "details/done.md"},
+    {"id": "error", "label": "Review error log", "description": "The last 'error:' line usually points to the root cause", "detailFile": "details/error.md"},
+    {"id": "fix", "label": "Fix config", "description": "Errors prevent activation; must be corrected before retrying", "detailFile": "details/fix.md"}
+  ],
+  "edges": [
+    {"source": "start", "target": "edit"},
+    {"source": "edit", "target": "stage"},
+    {"source": "stage", "target": "rebuild"},
+    {"source": "rebuild", "target": "check"},
+    {"source": "check", "target": "done", "label": "yes"},
+    {"source": "check", "target": "error", "label": "no"},
+    {"source": "error", "target": "fix"},
+    {"source": "fix", "target": "edit"}
+  ]
+}
