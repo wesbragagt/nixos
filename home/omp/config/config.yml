@@ -28,7 +28,6 @@ disabledExtensions:
   - skill:tasks
   - skill:worktree
   - skill:code
-  - skill:ast-grep
   - slash-command:tasks
   - slash-command:pr
   - slash-command:pr-feedback
