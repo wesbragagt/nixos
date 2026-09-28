@@ -29,7 +29,6 @@ disabledExtensions:
   - skill:worktree
   - skill:code
   - skill:ast-grep
-  - skill:openpencil
   - slash-command:tasks
   - slash-command:pr
   - slash-command:pr-feedback
