@@ -65,12 +65,8 @@ in
 
     home.file = {
       ".claude/CLAUDE.md".source =
-        config.lib.file.mkOutOfStoreSymlink "${cfg.configRoot}/CLAUDE.md";
+        config.lib.file.mkOutOfStoreSymlink "${repoRoot}/home/agents/AGENTS.md";
       ".claude/agents".source = config.lib.file.mkOutOfStoreSymlink "${cfg.configRoot}/agents";
-      ".claude/commands".source = config.lib.file.mkOutOfStoreSymlink "${cfg.configRoot}/commands";
-      ".claude/rules".source = config.lib.file.mkOutOfStoreSymlink "${cfg.configRoot}/rules";
-      ".claude/output-styles/asd-ste100.md".source =
-        config.lib.file.mkOutOfStoreSymlink "${cfg.configRoot}/output-styles/asd-ste100.md";
     }
     // lib.optionalAttrs hunkEnabled {
       ".claude/skills/hunk".source = inputs.hunk + "/skills/hunk-review";
@@ -89,10 +85,10 @@ in
       $DRY_RUN_CMD mkdir -p "$HOME/.claude"
       if [ -f "$settings" ]; then
         $DRY_RUN_CMD ${pkgs.jq}/bin/jq \
-          '.outputStyle = "ASD-STE100" | .env.ENABLE_CLAUDEAI_MCP_SERVERS = "false" | .permissions.deny = ((.permissions.deny // []) + ["WebSearch"] | unique)' \
+          'del(.outputStyle) | .env.ENABLE_CLAUDEAI_MCP_SERVERS = "false" | .permissions.deny = ((.permissions.deny // []) + ["WebSearch"] | unique)' \
           "$settings" > "$tmp"
       else
-        $DRY_RUN_CMD printf '%s\n' '{"outputStyle":"ASD-STE100","env":{"ENABLE_CLAUDEAI_MCP_SERVERS":"false"},"permissions":{"deny":["WebSearch"]}}' > "$tmp"
+        $DRY_RUN_CMD printf '%s\n' '{"env":{"ENABLE_CLAUDEAI_MCP_SERVERS":"false"},"permissions":{"deny":["WebSearch"]}}' > "$tmp"
       fi
       $DRY_RUN_CMD mv "$tmp" "$settings"
     '';

@@ -5,13 +5,6 @@ let
     bun-bin-1_4_2 = pkgs.callPackage ../../pkgs/bun-bin-1_4_2 { };
   };
 
-  mkSkillLinks = import ../lib/mk-skill-links.nix { inherit lib; };
-  repoSkillLinks = mkSkillLinks {
-    inherit (config.lib.file) mkOutOfStoreSymlink;
-    skillsRoot = cfg.skillsRoot;
-    targetPrefix = ".omp/agent/skills";
-  };
-
   agentsLink = lib.optionalAttrs (builtins.pathExists ./config/agents) {
     ".omp/agent/agents".source = config.lib.file.mkOutOfStoreSymlink "${cfg.configRoot}/agents";
   };
@@ -71,11 +64,6 @@ in
       description = "Repo-managed OMP agent config root.";
     };
 
-    skillsRoot = lib.mkOption {
-      type = lib.types.str;
-      default = "${repoRoot}/home/skills";
-      description = "Shared skills source root, linked into ~/.omp/agent/skills.";
-    };
   };
 
   config = lib.mkIf cfg.enable {
@@ -87,13 +75,15 @@ in
         config.lib.file.mkOutOfStoreSymlink "${cfg.configRoot}/config.yml";
       ".omp/agent/models.yml".source = modelsFile;
       ".omp/agent/AGENTS.md".source =
-        config.lib.file.mkOutOfStoreSymlink "${cfg.configRoot}/AGENTS.md";
-      ".omp/agent/rules/communication.md".source =
-        config.lib.file.mkOutOfStoreSymlink "${cfg.configRoot}/rules/communication.md";
+        config.lib.file.mkOutOfStoreSymlink "${repoRoot}/home/agents/AGENTS.md";
     }
     // agentsLink
     // verifierAgentLink
-    // repoSkillLinks;
+    // {
+      # One skills dir for both harnesses: repo skills plus anything installed into Claude.
+      ".omp/agent/skills".source =
+        config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/.claude/skills";
+    };
 
     # OMP writes runtime files (config.yml updates, dbs) into ~/.omp/agent.
     # Drop any pre-existing plain files so home-manager can take over the
@@ -105,6 +95,9 @@ in
           $DRY_RUN_CMD rm -f "$target"
         fi
       done
+      if [ -d "$HOME/.omp/agent/skills" ] && [ ! -L "$HOME/.omp/agent/skills" ]; then
+        $DRY_RUN_CMD rm -rf "$HOME/.omp/agent/skills"
+      fi
     '';
   };
 }

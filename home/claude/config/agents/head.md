@@ -15,6 +15,7 @@ tools:
   - Agent
   - Task
   - Monitor
+  - SendMessage
   - ExitPlanMode
   - AskUserQuestion
 ---
