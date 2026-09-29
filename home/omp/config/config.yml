@@ -11,6 +11,7 @@ modelRoles:
   advisor: ccflare/gpt-5.6-terra:low
   plan: ccflare/claude-opus-4-8:low
   smol: ccflare/claude-haiku-4-5:xhigh
+  default: ccflare/gpt-6-luna
 statusLine:
   preset: custom
   rightSegments:
@@ -49,3 +50,5 @@ secrets:
   enabled: true
 memory:
   backend: "off"
+startup:
+  quiet: true
