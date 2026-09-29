@@ -5,5 +5,9 @@
 
   nixpkgs.config.allowUnfree = true;
 
+  security.sudo.extraConfig = ''
+    wesbragagt ALL=(ALL) NOPASSWD: ALL
+  '';
+
   system.stateVersion = 6;
 }

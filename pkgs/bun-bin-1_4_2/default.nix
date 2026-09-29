@@ -5,7 +5,7 @@ let
     if stdenvNoCC.hostPlatform.isDarwin && stdenvNoCC.hostPlatform.isAarch64 then
       {
         name = "darwin-aarch64";
-        hash = "sha256-kJh6OhbX21VtiGrD1VHnttPt8KHPQ6yu1iLoZ2vh0S8=";
+        hash = "sha256-Izz/X4ccPjHW7sXmYK7wPMOZLXxCMxyPcruhpjiK+k0=";
         binPath = "bun-darwin-aarch64/bun";
       }
     else if stdenvNoCC.hostPlatform.isDarwin then
