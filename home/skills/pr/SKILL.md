@@ -17,8 +17,8 @@ Always commit, then push, then create or update the PR.
 3. Find the branch and the base. Use `git branch --show-current`.
 4. Push the branch: `git push -u origin HEAD`
 5. Read the change: `git log origin/<base>..HEAD --oneline` and `git diff origin/<base>..HEAD --stat`
-6. Write the title and the body.
-7. Create or update the PR.
+6. Write the title. Write the body to a local draft file: `<scratchpad>/pr-body.md`.
+7. Create or update the PR with the check and `gh` in one command. See **Body length check**.
 8. Monitor the CI checks. See **CI checks**.
 
 ## Base branch
@@ -43,7 +43,7 @@ If a PR exists:
 1. Commit new changes.
 2. Push the branch.
 3. Write the body again from the full diff against the base, not only the new commits.
-4. Run `gh pr edit --body "<updated body>"`.
+4. Run the update command from **Body length check**.
 5. Print the PR URL. Say that you updated the description.
 
 ## Title
@@ -98,6 +98,30 @@ Use this structure. Remove an optional section that has no useful content.
 * Never name an AI tool, a review tool, a reviewer, or a scratch file.
 * Never describe the process that made the change. Describe the change.
 </rules>
+
+## Body length check
+
+The check runs on the local draft file, never on a published PR. Run `gh pr create` and `gh pr edit` only in the same command as the check, joined with `&&`. The check gates the publish.
+
+Create:
+
+```bash
+bash ~/.claude/skills/pr/check-body.sh <scratchpad>/pr-body.md 500 \
+  && gh pr create --base <base-branch> --title "<title>" --body-file <scratchpad>/pr-body.md
+```
+
+Update:
+
+```bash
+bash ~/.claude/skills/pr/check-body.sh <scratchpad>/pr-body.md 500 \
+  && gh pr edit --body-file <scratchpad>/pr-body.md
+```
+
+The limit is 500 words. Diagrams do not count. The script drops fenced `mermaid`, `plantuml`, `dot`, `graphviz`, and `d2` blocks and markdown images before it counts. Config examples and other code blocks count.
+
+The script exits 1 when the draft is over 500 words. It exits 2 when the draft file is missing or empty. On a non-zero exit, `gh` does not run. Shorten the draft and run the command again. Do not raise the limit to pass.
+
+Edit only the draft file. Publish that same file, so the checked text is the published text.
 
 ## CI checks
 
@@ -170,5 +194,5 @@ Stop after three failed attempts on the same check. Report what you tried. Ask t
 * Do not report the PR as done while the checks still run.
 * Do not merge the PR.
 * Do not re-run a failed check to see if it passes the second time. Find the cause.
-* DO NOT write a PR description that is more than 700 words.
+* Do not run `gh pr create` or `gh pr edit` without `check-body.sh ... &&` in front of it.
 </rules>
