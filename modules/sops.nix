@@ -25,6 +25,9 @@ in
       exa_api_key = {
         owner = "wesbragagt";
       };
+      forgejo_token = {
+        owner = "wesbragagt";
+      };
     };
   };
 }

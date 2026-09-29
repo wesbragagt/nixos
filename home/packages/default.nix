@@ -40,6 +40,23 @@ let
       }
     else
       pkgs.python3;
+  forgejoHost = "forgejo.dory-pentatonic.ts.net";
+  # fj has no env-var token support, so log in from the sops secret on first use.
+  fj = pkgs.writeShellApplication {
+    name = "fj";
+    runtimeInputs = [ pkgs.forgejo-cli ];
+    text = ''
+      host="${forgejoHost}"
+      token_file=/run/secrets/forgejo_token
+      if [[ -r "$token_file" ]] && ! fj auth list 2>/dev/null | grep -q "@$host$"; then
+        fj --host "$host" auth add-key wesbragagt "$(< "$token_file")" >/dev/null
+      fi
+      for arg in "$@"; do
+        [[ "$arg" == -H || "$arg" == --host || "$arg" == --host=* ]] && exec fj "$@"
+      done
+      exec fj --host "$host" "$@"
+    '';
+  };
   clipboardSelector = pkgs.writeShellScriptBin "clipboard-selector" ''
     set -euo pipefail
 
@@ -121,7 +138,7 @@ in
       # cli tools
       inputs.exacli.packages.${hostSystem}.default
       gh
-      forgejo-cli
+      fj
       jq
       yq-go
       go
