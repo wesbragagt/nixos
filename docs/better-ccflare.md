@@ -101,6 +101,8 @@ models:
   - gpt-5.6-terra
   - gpt-5.6-sol
   - gpt-6-astra
+  - gpt-6-luna
+  - gpt-6-sol
 ```
 
 Edit this file to change the base URL, API key, or model list.
