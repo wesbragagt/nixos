@@ -85,10 +85,10 @@ in
       $DRY_RUN_CMD mkdir -p "$HOME/.claude"
       if [ -f "$settings" ]; then
         $DRY_RUN_CMD ${pkgs.jq}/bin/jq \
-          'del(.outputStyle) | .env.ENABLE_CLAUDEAI_MCP_SERVERS = "false" | .permissions.deny = ((.permissions.deny // []) + ["WebSearch"] | unique) | .attribution = {"commit": "", "pr": ""}' \
+          'del(.outputStyle) | .env.ENABLE_CLAUDEAI_MCP_SERVERS = "false" | .permissions.deny = ((.permissions.deny // []) + ["WebSearch"] | unique) | .attribution = {"commit": "", "pr": ""} | .autoMemoryEnabled = false' \
           "$settings" > "$tmp"
       else
-        $DRY_RUN_CMD printf '%s\n' '{"env":{"ENABLE_CLAUDEAI_MCP_SERVERS":"false"},"permissions":{"deny":["WebSearch"]},"attribution":{"commit":"","pr":""}}' > "$tmp"
+        $DRY_RUN_CMD printf '%s\n' '{"env":{"ENABLE_CLAUDEAI_MCP_SERVERS":"false"},"permissions":{"deny":["WebSearch"]},"attribution":{"commit":"","pr":""},"autoMemoryEnabled":false}' > "$tmp"
       fi
       $DRY_RUN_CMD mv "$tmp" "$settings"
     '';
