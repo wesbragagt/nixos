@@ -182,6 +182,7 @@ in
       (pkgs.writeShellScriptBin "agent-notify" (builtins.readFile ../../scripts/agent-notify.sh))
       (pkgs.writeShellScriptBin "omp-prewalk" (builtins.readFile ../../scripts/omp-prewalk.sh))
       (pkgs.callPackage ../../pkgs/workmux { })
+      (pkgs.callPackage ../../pkgs/wtask { })
     ]
     ++ lib.optionals isLinux [
       # linux-only cli tools (nix-ld / x86_64 binaries / linux-specific packaging)

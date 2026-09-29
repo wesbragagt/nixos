@@ -29,7 +29,7 @@ Execute tasks from a tasks.yaml file by orchestrating code-writer agents. Automa
 
 1. **Load and validate tasks.yaml**:
    ```bash
-   uv run ~/.claude/skills/tasks/tasks.py <path-to-tasks-yaml> summary
+   wtask <path-to-tasks-yaml> summary
    ```
    Report task summary:
    - Total, done, in-progress, open counts
@@ -41,7 +41,7 @@ Execute tasks from a tasks.yaml file by orchestrating code-writer agents. Automa
    - All keys in `depends` have `status == "done"`
 
    ```bash
-   uv run ~/.claude/skills/tasks/tasks.py <path> ready
+   wtask <path> ready
    ```
 
 4. **If no ready tasks**:
@@ -63,7 +63,7 @@ Execute tasks from a tasks.yaml file by orchestrating code-writer agents. Automa
 
    a. **Mark in progress**:
    ```bash
-   uv run ~/.claude/skills/tasks/tasks.py <path> set <task-key> progress
+   wtask <path> set <task-key> progress
    ```
 
    b. **Gather a standalone task packet**:
@@ -148,7 +148,7 @@ Execute tasks from a tasks.yaml file by orchestrating code-writer agents. Automa
    f. **Gate status on the verifier verdict**:
    - Only an evidence-backed `PASS` permits marking the task `done`:
      ```bash
-     uv run ~/.claude/skills/tasks/tasks.py <path> set <task-key> done
+     wtask <path> set <task-key> done
      ```
    - `FAIL`, `BLOCKED`, or `PARTIAL` keeps the task `progress`. Return the verifier's evidence and do not mark it done.
    - Never mark a completed implementation task `done` without a dedicated verifier `PASS`.
@@ -159,20 +159,20 @@ Execute tasks from a tasks.yaml file by orchestrating code-writer agents. Automa
 
 8. **Final verification** when all tasks report done:
    ```bash
-   uv run ~/.claude/skills/tasks/tasks.py <path> verify
+   wtask <path> verify
    ```
 
 ## Task Management Reference
 
 | Operation | Command |
 |-----------|---------|
-| Summary | `uv run ~/.claude/skills/tasks/tasks.py <path> summary` |
-| List all tasks | `uv run ~/.claude/skills/tasks/tasks.py <path> list` |
-| View ready tasks | `uv run ~/.claude/skills/tasks/tasks.py <path> ready` |
-| View in progress | `uv run ~/.claude/skills/tasks/tasks.py <path> list --status progress` |
-| Mark in progress | `uv run ~/.claude/skills/tasks/tasks.py <path> set KEY progress` |
-| Mark done | `uv run ~/.claude/skills/tasks/tasks.py <path> set KEY done` |
-| Verify all done | `uv run ~/.claude/skills/tasks/tasks.py <path> verify` |
+| Summary | `wtask <path> summary` |
+| List all tasks | `wtask <path> list` |
+| View ready tasks | `wtask <path> ready` |
+| View in progress | `wtask <path> list --status progress` |
+| Mark in progress | `wtask <path> set KEY progress` |
+| Mark done | `wtask <path> set KEY done` |
+| Verify all done | `wtask <path> verify` |
 
 ## Error Handling
 

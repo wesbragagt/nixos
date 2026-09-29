@@ -127,10 +127,20 @@ Verify all of the following:
 Run:
 
 ```bash
-uv run ~/.omp/agent/skills/tasks/tasks.py <output-dir>/tasks.yaml summary
+wtask <output-dir>/tasks.yaml summary
 ```
 
 The summary must show only `open` tasks.
+
+### 6. Open for review
+
+Open a new tmux window in the current session with nvim on the spec and tasks so the user can review them immediately:
+
+```bash
+tmux new-window -t "$(tmux display-message -p '#S')" -n review "nvim '<output-dir>/spec.md' '<output-dir>/tasks.yaml'"
+```
+
+Skip this step when not running inside tmux (`echo "$TMUX"` is empty).
 
 ## Delivery format
 

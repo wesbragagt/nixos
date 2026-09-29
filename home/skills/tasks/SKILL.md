@@ -5,7 +5,7 @@ description: "Manage a spec.md + tasks.yaml task set: create it via the to-spec 
 
 # Task Breakdown and Tracking
 
-Manage a `tasks.yaml` task set. Create it via the `to-spec` skill when one does not exist yet, then track status with the `tasks.py` CLI.
+Manage a `tasks.yaml` task set. Create it via the `to-spec` skill when one does not exist yet, then track status with the `wtask` CLI.
 
 ## Usage
 
@@ -22,6 +22,16 @@ Example: "Build user authentication system" → `build-user-auth-system`
 ## Output Location
 
 Specs live under `.specs/<feature-name>/`, resolved to the main checkout root when the current work is in a git worktree. See the `to-spec` skill for the exact resolution rule.
+
+## File Naming
+
+The task file is renamed automatically to reflect overall progress, so `ls` shows status at a glance:
+
+- `tasks.yaml` — all tasks open
+- `tasks.progress.yaml` — at least one task in progress or done (but not all done)
+- `tasks.done.yaml` — all tasks done
+
+Every `wtask` subcommand accepts any of the three filenames for a given task set and resolves to whichever actually exists on disk — you don't need to track the current name yourself.
 
 ## Task YAML Spec
 
@@ -49,7 +59,7 @@ tasks:
 ### Phase 2: Validate
 
 ```bash
-uv run ~/.omp/agent/skills/tasks/tasks.py <output-dir>/tasks.yaml summary
+wtask <output-dir>/tasks.yaml summary
 ```
 
 Newly created task sets should show only `open` tasks.
@@ -58,24 +68,24 @@ Newly created task sets should show only `open` tasks.
 
 ```bash
 # Summary of task statuses
-uv run ~/.omp/agent/skills/tasks/tasks.py <path>/tasks.yaml summary
+wtask <path>/tasks.yaml summary
 
 # List tasks (optionally filter by status)
-uv run ~/.omp/agent/skills/tasks/tasks.py <path>/tasks.yaml list
-uv run ~/.omp/agent/skills/tasks/tasks.py <path>/tasks.yaml list --status open
+wtask <path>/tasks.yaml list
+wtask <path>/tasks.yaml list --status open
 
 # View a single task
-uv run ~/.omp/agent/skills/tasks/tasks.py <path>/tasks.yaml get <key>
+wtask <path>/tasks.yaml get <key>
 
 # Update task status
-uv run ~/.omp/agent/skills/tasks/tasks.py <path>/tasks.yaml set <key> progress
-uv run ~/.omp/agent/skills/tasks/tasks.py <path>/tasks.yaml set <key> done
+wtask <path>/tasks.yaml set <key> progress
+wtask <path>/tasks.yaml set <key> done
 
 # Show tasks whose dependencies are all done
-uv run ~/.omp/agent/skills/tasks/tasks.py <path>/tasks.yaml ready
+wtask <path>/tasks.yaml ready
 
 # Verify all tasks are done (exit 0) or list incomplete (exit 1)
-uv run ~/.omp/agent/skills/tasks/tasks.py <path>/tasks.yaml verify
+wtask <path>/tasks.yaml verify
 ```
 
 ## Output Format
