@@ -121,6 +121,7 @@ in
       # cli tools
       inputs.exacli.packages.${hostSystem}.default
       gh
+      forgejo-cli
       jq
       yq-go
       go

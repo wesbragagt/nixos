@@ -3,3 +3,4 @@ prds/
 reviews/
 
 config/features.yaml
+.specs/
