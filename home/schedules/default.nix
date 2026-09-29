@@ -15,11 +15,13 @@ let
     postBuild = ''
       wrapProgram $out/bin/schedules \
         --prefix PATH : ${
-          lib.makeBinPath [
-            pkgs.coreutils
-            pkgs.cronie
-            pkgs.tmux
-          ]
+          lib.makeBinPath (
+            [
+              pkgs.coreutils
+              pkgs.tmux
+            ]
+            ++ lib.optionals pkgs.stdenv.isLinux [ pkgs.cronie ]
+          )
         }
     '';
   };

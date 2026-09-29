@@ -14,27 +14,28 @@
 }:
 buildNpmPackage (finalAttrs: {
   pname = "claude-code";
-  version = "2.1.284";
+  version = "2.1.285";
 
   src = fetchzip {
     url = "https://registry.npmjs.org/@anthropic-ai/claude-code/-/claude-code-${finalAttrs.version}.tgz";
-    hash = "sha256-pIxU0/6i25wzRuRuo9dE+rL3CAwHhbvDttkPR/mYb34=";
+    hash = "sha256-o+EDE+jLbC0yz0IQxFh+lu4UrUfAtg16GsxaqAO7lik=";
   };
 
-  npmDepsHash = "sha256-DN+fGd4CpWw4K/wvUO+EROBSQnNzNiS9Z4pPgKwVsrQ=";
+  npmDepsHash = "sha256-KZMNeac0q0PG21dTnIetXF3ckAAmlWdqFvKoVYvlTj0=";
 
   strictDeps = true;
 
-  nativeBuildInputs = [ autoPatchelfHook ];
-  buildInputs = [ glibc ];
+  nativeBuildInputs = lib.optionals stdenv.hostPlatform.isLinux [ autoPatchelfHook ];
+  buildInputs = lib.optionals stdenv.hostPlatform.isLinux [ glibc ];
 
   postPatch = ''
     cp ${./package-lock.json} package-lock.json
+    mkdir -p node_modules
 
     cat > package.json <<'EOF'
     {
       "name": "@anthropic-ai/claude-code",
-      "version": "2.1.284",
+      "version": "2.1.285",
       "bin": {
         "claude": "bin/claude.exe"
       },
@@ -55,7 +56,8 @@ buildNpmPackage (finalAttrs: {
       },
       "dependencies": {},
       "optionalDependencies": {
-        "@anthropic-ai/claude-code-linux-x64": "2.1.284"
+        "@anthropic-ai/claude-code-linux-x64": "2.1.285",
+        "@anthropic-ai/claude-code-darwin-arm64": "2.1.285"
       },
       "files": [
         "bin/claude.exe",
@@ -72,6 +74,8 @@ buildNpmPackage (finalAttrs: {
   env.AUTHORIZED = "1";
 
   postInstall = ''
+    chmod +x $out/lib/node_modules/@anthropic-ai/claude-code/bin/claude.exe
+
     rm -f $out/bin/claude
     printf '%s\n' \
       '#!${stdenv.shell}' \
