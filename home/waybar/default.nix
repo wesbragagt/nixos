@@ -7,6 +7,7 @@
 }:
 let
   isLaptop = hostProfile.isLaptop or false;
+  transcribeEnabled = hostProfile.features.transcribe or false;
   waybarSettings = {
     layer = "top";
     position = "top";
@@ -28,8 +29,8 @@ let
       "pulseaudio"
       "bluetooth"
       "custom/idle"
-      "custom/transcribe"
     ]
+    ++ lib.optionals transcribeEnabled [ "custom/transcribe" ]
     ++ lib.optionals isLaptop [ "custom/battery" ]
     ++ [
       "clock"

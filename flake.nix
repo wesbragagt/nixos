@@ -83,6 +83,7 @@
         qbittorrent = false;
         mnemosyne = false;
         ffmpeg = false;
+        transcribe = false;
         # Coding agents ship on every host; set "<name>: false" in
         # /etc/nixos/features.yaml to opt a host out.
         # Off by default: the upstream npm postinstall downloads from

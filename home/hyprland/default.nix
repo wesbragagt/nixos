@@ -8,6 +8,7 @@
 }:
 let
   isLaptop = hostProfile.isLaptop or false;
+  transcribeEnabled = hostProfile.features.transcribe or false;
   hasWireless = hostProfile.hasWireless or false;
   swapAltSuper = hostProfile.swapAltSuper or true;
   hypridle = {
@@ -138,7 +139,7 @@ ${kbOptionsLine}      repeat_delay = 250
     bind = $mod SHIFT, R, exec, wf-record
     bind = $mod SHIFT, T, exec, wf-record-region
     bind = $mod SHIFT, I, exec, idle-control toggle
-    bind = $mod SHIFT, U, exec, transcribe toggle
+    ${lib.optionalString transcribeEnabled "bind = $mod SHIFT, U, exec, transcribe toggle"}
     bind = $mod SHIFT, l, exec, kill -35 $(pgrep -fo nwg-dock)
 
     bindel = , XF86AudioRaiseVolume, exec, wpctl set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ 5%+

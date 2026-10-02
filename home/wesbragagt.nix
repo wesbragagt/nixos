@@ -16,6 +16,7 @@ let
   claudeCodeEnabled = features.claude-code or false;
   ompEnabled = features.omp or false;
   mnemosyneEnabled = features.mnemosyne or false;
+  transcribeEnabled = features.transcribe or false;
   hunkEnabled = hostProfile.hunkEnabled or true;
   base = {
     imports = [
@@ -34,12 +35,12 @@ let
     ++ lib.optionals (!isHeadless) [
       ./hyprland
       ./waybar
-      ./transcribe
       ./wallpaper
       ./zen
       ./swaync.nix
       inputs.zen-browser.homeModules.beta
-    ];
+    ]
+    ++ lib.optionals (!isHeadless && transcribeEnabled) [ ./transcribe ];
 
     home.username = "wesbragagt";
     home.homeDirectory = homeDirectory;
