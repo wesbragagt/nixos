@@ -149,7 +149,7 @@ Report the resolved output path (noting when it was redirected to the main check
 End with the exact commands to run the tasks, using the resolved absolute path to `tasks.yaml` (the main checkout path when redirected from a worktree). Offer both:
 
 1. `/code <output-dir>/tasks.yaml` runs each task once, then stops.
-2. `/wgoal <output-dir>/tasks.yaml` runs `/code` in a loop until `wtask` reports every task done. It retries failed tasks with the verifier's evidence, up to 3 rounds. Add `--max-rounds N` to change the cap.
+2. `/wgoal <output-dir>/tasks.yaml` runs `/code` in a loop until `wtask` reports every task done. It retries failed tasks with the verifier's evidence, up to 3 rounds. Add `--max-rounds N` to change the cap. Add `-s` (or `--session`) to implement the tasks in the current session instead of dispatching subagents.
 
 Recommend option 1 when the task count is 3 or fewer, and option 2 otherwise. Both commands are for Claude Code. OMP disables the `code` skill.
 

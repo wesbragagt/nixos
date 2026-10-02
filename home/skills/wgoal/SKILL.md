@@ -1,18 +1,24 @@
 ---
 name: wgoal
-description: Run /code on a tasks.yaml in a loop until `wtask verify` reports every task done, a round cap is hit, a task is blocked, or a retry repeats the same failure. Use when the user types /wgoal or wants /code to keep going after a verifier FAIL or PARTIAL.
-argument-hint: <path-to-tasks-yaml> [--max-rounds N]
+description: Run a tasks.yaml in a loop until `wtask verify` reports every task done, a round cap is hit, a task is blocked, or a retry repeats the same failure. By default each task goes to subagents through /code. With -s or --session the current session implements every task itself. Use when the user types /wgoal or wants /code to keep going after a verifier FAIL or PARTIAL.
+argument-hint: <path-to-tasks-yaml> [-s|--session] [--max-rounds N]
 ---
 
-Wrap the `code` skill in a goal loop. The goal is fixed: `wtask <path> verify` exits 0. A skill cannot start the built-in `/goal` command, so this skill keeps the loop itself.
+Run a task set in a goal loop. The goal is fixed: `wtask <path> verify` exits 0. A skill cannot start the built-in `/goal` command, so this skill keeps the loop itself.
+
+Two modes differ only in who implements the tasks (step 4):
+
+- Default: the `code` skill dispatches `code-writer` subagents, one per task.
+- `-s` or `--session`: this session implements every task itself, so later tasks see the code and decisions from earlier ones. The read-only `verifier` subagent still checks each task, so the author does not grade their own work.
 
 ## Usage
 
 ```
-/wgoal <path-to-tasks-yaml> [--max-rounds N]
+/wgoal <path-to-tasks-yaml> [-s|--session] [--max-rounds N]
 ```
 
 - `path-to-tasks-yaml`: required. `wtask` renames the file to `tasks.progress.yaml` or `tasks.done.yaml` as status changes, and it accepts any of the three names. Pass the path unchanged every round.
+- `-s`, `--session`: implement the tasks in this session instead of dispatching subagents.
 - `--max-rounds`: default is 3.
 
 Read the `done` count from `wtask <path> summary` every time this skill mentions a done count.
@@ -26,7 +32,16 @@ A task's `details` path is relative to the tasks file's directory, not the curre
    - Run `wtask <path> set <key> open`.
    - Apply the retry note from step 8 with the verdict `none recorded (earlier run)`.
 3. Set `round = 1`, `previous_failures = none`.
-4. Invoke the `code` skill with the Skill tool, args `<path>`. It loads `code`'s instructions into this turn and does not return control by itself. When those instructions say to stop, report, or "allow user to retry", do not end the turn. Go to step 5.
+4. Run one round. Both modes end when no task is ready, then go to step 5.
+   - Default mode: invoke the `code` skill with the Skill tool, args `<path>`. It loads `code`'s instructions into this turn and does not return control by itself. When those instructions say to stop, report, or "allow user to retry", do not end the turn. Go to step 5.
+   - Session mode (`-s`, `--session`): do not invoke `code` and do not dispatch `code-writer-simple` or `code-writer-complex`. Repeat until `wtask <path> ready` is empty. Take the first ready task and run tasks one at a time, never in parallel, because they share this working tree:
+     1. Run `wtask <path> set <key> progress`.
+     2. Read the task's detail file, the acceptance criteria it names in `spec.md` (same directory), and the handoff record of each dependency.
+     3. Implement the task yourself with the normal edit tools. Follow the repo's conventions. Stay inside the task's scope section.
+     4. Run the exact acceptance checks the task file lists. Fix failures before you continue.
+     5. Fill in the task file's handoff record: files changed, decisions, interfaces produced, verification run, remaining risks.
+     6. Dispatch one `verifier` subagent with the task packet (key, description, details, acceptance criteria, dependency handoffs) and your implementation claim (summary and files). Tell it to inspect independently, return evidence for each conclusion, and return exactly one verdict: PASS, FAIL, BLOCKED, or PARTIAL.
+     7. On PASS, run `wtask <path> set <key> done` and print `done: <key>`. On any other verdict, leave the task in `progress` and continue with the next ready task. Its dependents stay blocked, and independent tasks still run.
 5. Run `wtask <path> verify`.
    - Exit 0: report "goal met after N rounds" with the `wtask <path> summary` output and stop.
    - Non-zero: go to step 6.
@@ -59,11 +74,13 @@ Next: <one concrete command>
 The next command depends on the reason:
 
 - `blocked`: the step that removes the blocker, named from the verifier's evidence.
-- `round cap`: `/wgoal <path> --max-rounds <N + 2>`
-- `same failure twice`: read the task's detail file, then fix the cause by hand before you run `/wgoal <path>` again.
+- `round cap`: `/wgoal <path> --max-rounds <N + 2>`, with the same `-s` flag if it was set
+- `same failure twice`: read the task's detail file, then fix the cause by hand before you run `/wgoal <path>` again with the same flags.
 
 ## Rules
 
-- Never mark a task `done` here. Only `code`, after a verifier PASS, does that.
+- Default mode: never mark a task `done` here. Only `code`, after a verifier PASS, does that.
+- Session mode: mark a task `done` only after a dispatched `verifier` returns an evidence-backed PASS. Your own checks do not count.
 - Never edit `tasks.yaml` by hand. Use `wtask`.
 - Do not run `code` in parallel with itself.
+- Session mode: context grows with every task. If the session nears its context limit, finish the current task's `done` or `progress` update, print the stop report, and tell the user to rerun `/wgoal -s <path>` in a fresh session. No work is lost, because status lives in `wtask`.
