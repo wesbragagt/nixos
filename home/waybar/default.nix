@@ -28,6 +28,7 @@ let
       "pulseaudio"
       "bluetooth"
       "custom/idle"
+      "custom/transcribe"
     ]
     ++ lib.optionals isLaptop [ "custom/battery" ]
     ++ [
@@ -83,6 +84,14 @@ let
       on-click = "idle-control toggle";
       "return-type" = "json";
       signal = 8;
+    };
+
+    "custom/transcribe" = {
+      exec = "transcribe status";
+      interval = 5;
+      on-click = "transcribe toggle";
+      "return-type" = "json";
+      signal = 9;
     };
 
     mpris = {
@@ -178,6 +187,7 @@ let
     #custom-battery,
     #custom-notifications,
     #custom-idle,
+    #custom-transcribe,
     #mpris,
     #clock,
     #tray {
@@ -234,6 +244,8 @@ let
 
     #custom-idle.enabled { color: #89b4fa; }
     #custom-idle.inhibited { color: #f9e2af; }
+    #custom-transcribe.recording { color: #f38ba8; }
+    #custom-transcribe.disabled { color: #6c7086; }
 
     #mpris.paused { color: #6c7086; }
     #mpris.stopped { opacity: 0; padding: 0; margin: 0; }

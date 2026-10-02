@@ -34,6 +34,7 @@ let
     ++ lib.optionals (!isHeadless) [
       ./hyprland
       ./waybar
+      ./transcribe
       ./wallpaper
       ./zen
       ./swaync.nix

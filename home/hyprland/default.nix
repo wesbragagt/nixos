@@ -138,6 +138,7 @@ ${kbOptionsLine}      repeat_delay = 250
     bind = $mod SHIFT, R, exec, wf-record
     bind = $mod SHIFT, T, exec, wf-record-region
     bind = $mod SHIFT, I, exec, idle-control toggle
+    bind = $mod SHIFT, U, exec, transcribe toggle
     bind = $mod SHIFT, l, exec, kill -35 $(pgrep -fo nwg-dock)
 
     bindel = , XF86AudioRaiseVolume, exec, wpctl set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ 5%+

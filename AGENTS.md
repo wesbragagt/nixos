@@ -120,7 +120,7 @@ schedules remove <name>
 ## Desktop iteration shortcuts
 
 - Reload Hyprland: `hyprctl reload`
-- Restart Waybar: `pkill waybar && hyprctl dispatch exec waybar`
+- Restart Waybar: `systemctl --user restart waybar` (systemd respawns it, so `hyprctl dispatch exec` adds a duplicate)
 - Restart dock: `pkill nwg-dock && hyprctl dispatch exec "nwg-dock-hyprland ..."`
 - Cursor changes: `hyprctl setcursor <theme> <size>`
 
