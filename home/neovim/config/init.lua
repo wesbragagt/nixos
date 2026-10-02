@@ -29,6 +29,7 @@ vim.pack.add({
   { src = "https://github.com/christoomey/vim-tmux-navigator" },
   { src = "https://github.com/nvim-tree/nvim-web-devicons" },
   { src = "https://github.com/stevearc/oil.nvim" },
+  { src = "https://github.com/nvim-tree/nvim-tree.lua" },
   { src = "https://github.com/tpope/vim-fugitive" },
   { src = "https://github.com/norcalli/nvim-colorizer.lua" },
   { src = "https://github.com/folke/zen-mode.nvim" },
@@ -77,6 +78,11 @@ require("colorizer").setup({
 })
 require("oil").setup({
   columns = { "icon" },
+})
+require("nvim-tree").setup({
+  view = { width = 35 },
+  filters = { dotfiles = false },
+  git = { ignore = false },
 })
 require("zen-mode").setup({
   window = {
@@ -185,6 +191,7 @@ vim.keymap.set("n", "<leader>di", vim.diagnostic.setqflist, { desc = "Diagnostic
 vim.keymap.set("n", "<leader>pt", function()
   vim.cmd("Oil")
 end, { desc = "Open Oil" })
+vim.keymap.set("n", "<leader>E", "<cmd>NvimTreeToggle<cr>", { desc = "Toggle file tree" })
 vim.keymap.set("n", "<leader>z", "<cmd>ZenMode<cr>", { desc = "Toggle Zen Mode" })
 
 vim.keymap.set("x", "<leader>y", '"+y', { desc = "Yank selection to system clipboard" })
