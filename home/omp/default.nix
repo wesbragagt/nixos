@@ -43,6 +43,42 @@ let
         cacheWrite = 12.5;
       };
     };
+    "gpt-6-luna" = {
+      name = "GPT-6 Luna";
+      reasoning = true;
+      supportsTools = true;
+      contextWindow = 1050000;
+      maxTokens = 128000;
+      input = [ "text" "image" ];
+      thinking = {
+        mode = "effort";
+        efforts = [ "none" "low" "medium" "high" "xhigh" "max" ];
+      };
+      cost = {
+        input = 0.1;
+        output = 0.5;
+        cacheRead = 0.01;
+        cacheWrite = 0.125;
+      };
+    };
+    "gpt-6-sol" = {
+      name = "GPT-6 Sol";
+      reasoning = true;
+      supportsTools = true;
+      contextWindow = 1050000;
+      maxTokens = 128000;
+      input = [ "text" "image" ];
+      thinking = {
+        mode = "effort";
+        efforts = [ "none" "low" "medium" "high" "xhigh" "max" ];
+      };
+      cost = {
+        input = 2;
+        output = 10;
+        cacheRead = 0.2;
+        cacheWrite = 2.5;
+      };
+    };
   };
 
   # Generated from home/ccflare/config.yml so OMP and Claude Code share one pointer.
