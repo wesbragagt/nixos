@@ -118,6 +118,22 @@ The `home/ccflare` module reads this file at evaluation time and exposes
 OMP only shows model IDs listed in `home/ccflare/config.yml`.
 The active Codex OAuth account cannot provide a model catalog.
 Test each new model before adding it.
+### Updating OMP
+
+Update the packaged OMP release, npm lockfile, and Nix hashes with:
+
+```bash
+./scripts/update-omp.sh
+```
+
+Pass a version to update to a specific release:
+
+```bash
+./scripts/update-omp.sh 18.8.9
+```
+
+The script keeps `~/.omp/agent/config.yml` as an out-of-store symlink. The source remains `home/omp/config/config.yml`; package updates do not replace it.
+
 
 ### Model metadata for models OMP does not know
 

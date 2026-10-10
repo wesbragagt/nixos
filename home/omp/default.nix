@@ -52,7 +52,7 @@ let
       input = [ "text" "image" ];
       thinking = {
         mode = "effort";
-        efforts = [ "none" "low" "medium" "high" "xhigh" "max" ];
+        efforts = [ "minimal" "low" "medium" "high" "xhigh" "max" ];
       };
       cost = {
         input = 0.1;
@@ -70,7 +70,7 @@ let
       input = [ "text" "image" ];
       thinking = {
         mode = "effort";
-        efforts = [ "none" "low" "medium" "high" "xhigh" "max" ];
+        efforts = [ "minimal" "low" "medium" "high" "xhigh" "max" ];
       };
       cost = {
         input = 2;
