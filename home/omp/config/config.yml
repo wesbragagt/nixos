@@ -4,14 +4,7 @@ providers:
     - exa
     - codex
 modelRoles:
-  slow: ccflare/claude-fable-5-1:low
-  designer: ccflare/gpt-5.6-luna:low
-  task: ccflare/claude-sonnet-5:low
-  vision: ccflare/claude-sonnet-5:low
-  advisor: ccflare/gpt-5.6-terra:low
-  plan: ccflare/claude-opus-4-8:low
-  smol: ccflare/claude-haiku-4-5:xhigh
-  default: ccflare/gpt-6-luna
+  default: ccflare/gpt-6-luna:low
 statusLine:
   preset: custom
   rightSegments:

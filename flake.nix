@@ -27,6 +27,10 @@
       url = "github:wesbragagt/exacli";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
+    iceman = {
+      url = "github:wesbragagt/iceman";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
+    };
     hunk = {
       url = "github:modem-dev/hunk";
       inputs.nixpkgs.follows = "nixpkgs";
