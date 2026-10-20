@@ -86,7 +86,20 @@ let
     providers.ccflare = {
       inherit (config.wes.ccflare) baseUrl apiKey;
       api = "anthropic-messages";
+      discovery.type = "openai-models-list";
       models = map (id: { inherit id; } // (modelMetadata.${id} or { })) config.wes.ccflare.models;
+    };
+    providers.local-qwen = {
+      baseUrl = "http://127.0.0.1:7888/v1";
+      api = "openai-completions";
+      auth = "none";
+      models = [ {
+        id = "qwen-4b-64k";
+        name = "Qwen 4B 64K";
+        contextWindow = 65536;
+        maxTokens = 65536;
+        input = [ "text" "image" ];
+      } ];
     };
   };
 in

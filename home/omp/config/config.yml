@@ -1,10 +1,7 @@
 setupVersion: 2
-providers:
-  webSearchOrder:
-    - exa
-    - codex
 modelRoles:
   default: ccflare/gpt-6-luna:low
+  web: web/exa
 statusLine:
   preset: custom
   rightSegments:
@@ -45,3 +42,18 @@ memory:
   backend: "off"
 startup:
   quiet: true
+retry:
+  fallbackChains:
+    web:
+      - openai-codex/gpt-5.6-luna
+      - web/parallel
+      - web/hosted
+      - web/firecrawl
+      - web/searxng
+      - web/startpage
+      - web/duckduckgo
+      - web/ecosia
+      - web/google
+      - web/mojeek
+      - web/public
+extendedContext: true

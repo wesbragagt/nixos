@@ -117,9 +117,16 @@ The `home/ccflare` module reads this file at evaluation time and exposes
 - `home/omp/default.nix` generates `~/.omp/agent/models.yml` from these
   values, in the provider format OMP expects.
 
-OMP only shows model IDs listed in `home/ccflare/config.yml`.
-The active Codex OAuth account cannot provide a model catalog.
-Test each new model before adding it.
+OMP also discovers model IDs from ccflare's `/v1/models` endpoint through
+`discovery.type = "openai-models-list"`. Newly advertised models do not need
+an entry in `home/ccflare/config.yml`. Existing entries remain available,
+including Claude models that ccflare does not currently advertise.
+
+Discovery uses a cache. Run `omp models refresh` to force a fresh fetch,
+then `omp models ccflare` to inspect the available models. Discovery does
+not change model roles or guarantee accurate metadata for unknown IDs;
+keep the metadata overrides below for models that need them.
+
 ### Updating OMP
 
 Update the packaged OMP release, npm lockfile, and Nix hashes with:

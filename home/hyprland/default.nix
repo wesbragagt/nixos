@@ -303,11 +303,19 @@ in
     };
   };
 
+  systemd.user.services.hyprlock = {
+    Unit.Description = "Hyprland screen locker";
+    Service = {
+      ExecStart = "${pkgs.hyprlock}/bin/hyprlock";
+      Slice = "session.slice";
+    };
+  };
+
   services.hypridle = {
     enable = true;
     settings = {
       general = {
-        lock_cmd = "pidof hyprlock || hyprlock";
+        lock_cmd = "pidof hyprlock || systemctl --user start hyprlock.service";
         before_sleep_cmd = "loginctl lock-session";
         after_sleep_cmd = "hyprctl dispatch dpms on";
         ignore_dbus_inhibit = false;

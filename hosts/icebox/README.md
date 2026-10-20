@@ -2,6 +2,8 @@
 
 Starter desktop host based on `nixos-hp`, using hostname `icebox`, the same `wesbragagt` user, and shared base config, but without laptop-only/wireless profile features. It also disables the Hyprland Alt/Super swap with `swapAltSuper = false` and uses a desktop idle policy: lock after 15 minutes, turn displays off after 20 minutes, and suspend after 30 minutes only when no SSH session is active.
 
+`idle-control toggle` or Super+Shift+I disables idle timers without unlocking the desktop. The lock screen runs in its own `hyprlock.service`, so stopping `hypridle.service` does not kill it and leave Hyprland locked without a password prompt.
+
 Before installing or building this host, generate the machine-specific hardware config on icebox:
 
 ```bash

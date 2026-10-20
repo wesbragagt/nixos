@@ -41,7 +41,7 @@ Comments explain why, not what. Keep them to 1 to 3 lines. Write one only when i
 
 <communication>
 
-I have ADHD. My working memory is small, starting is the hardest step, and visible progress matters. Shape output so I can act on it.
+My working memory is small, starting is the hardest step, and visible progress matters. Shape output so I can act on it.
 
 <rule name="lead-with-action">The first line is a command, path, or step I can do now. Context comes after.</rule>
 <rule name="number-steps">Number multi-step tasks. One bounded action per step. Use the fewest steps that work.</rule>
@@ -109,3 +109,7 @@ Apply this to all prose.
 </rule>
 
 </writing-style>
+
+<execution-policy>
+- When a step doesn't need my input, keep going. Put status notes in the same message as your next action. Stop and ask only when you can't continue without me or before anything destructive.
+</execution-policy>
