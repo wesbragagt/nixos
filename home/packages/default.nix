@@ -138,7 +138,6 @@ in
       # cli tools
       inputs.iceman.packages.${hostSystem}.default
       inputs.exacli.packages.${hostSystem}.default
-      inputs.iceman.packages.${hostSystem}.default
       gh
       fj
       jq

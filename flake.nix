@@ -59,9 +59,6 @@
       url = "github:nix-community/nur-combined";
       flake = false;
     };
-    iceman = {
-      url = "github:wesbragagt/iceman";
-    };
   };
 
   outputs =
