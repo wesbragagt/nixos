@@ -162,7 +162,10 @@ ${wirelessAutostartLine}    exec-once = nwg-dock-hyprland -p bottom -lp end -i 3
     exec-once = blueman-applet
     exec-once = swww-daemon
 
-    monitor = ${monitorConfig}
+    monitor = ${monitorConfig},bitdepth,10
+    render {
+      cm_fs_passthrough = 2
+    }
 
     windowrulev2 = float, class:^(waypaper)$
     windowrulev2 = size 900 600, class:^(waypaper)$
