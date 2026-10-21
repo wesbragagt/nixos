@@ -80,6 +80,8 @@ Home Manager installs Quickshell and starts `quickshell.service` with the Hyprla
 
 The imported bar includes workspaces, CPU/memory/disk usage, audio controls, idle control, host-enabled transcription, Wi-Fi settings, Bluetooth status, clock, temperature, and session locking. Idle control shares `idle-control` with Super+Shift+I. The imported design does not include Waybar's media, laptop battery, notification, or system tray widgets.
 
+Hover over CPU, memory, or disk badges for details. CPU shows its model, logical CPU count, usage, and load averages. Memory shows used, available, and total capacity. Disk shows root filesystem usage and capacity. Values refresh with the bar's two-second resource poll; moving the pointer away dismisses the tooltip.
+
 ## npm global packages
 
 npm global installs are routed into `~/.npm-global` by the dedicated Home Manager

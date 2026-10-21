@@ -28,9 +28,17 @@ PanelWindow {
   readonly property color blue: "#89b4fa"
   readonly property color pink: "#f5a9b8"
   readonly property color green: "#a6d5bc"
-  property int cpu: 0
-  property int memory: 0
-  property int disk: 0
+  property int cpu: -1
+  property int memory: -1
+  property int disk: -1
+  property string cpuModel: ""
+  property int logicalCpus: 0
+  property string cpuLoad: ""
+  property double memoryTotal: -1
+  property double memoryAvailable: -1
+  property double diskTotal: -1
+  property double diskUsed: -1
+  property double diskAvailable: -1
   property int temperature: -1
   property int volume: 0
   property bool muted: false
@@ -41,6 +49,12 @@ PanelWindow {
   property string transcriptionState: "unknown"
   readonly property bool transcribeEnabled: Quickshell.env("QUICKSHELL_TRANSCRIBE") === "1"
   property bool idleEnabled: true
+
+  function formatSize(kib) {
+    if (kib < 0) return "unavailable"
+    return kib >= 1048576 ? (kib / 1048576).toFixed(1) + " GiB"
+      : (kib / 1024).toFixed(1) + " MiB"
+  }
 
   component Label: Text {
     color: bar.foreground
@@ -53,12 +67,53 @@ PanelWindow {
     id: badge
     property string icon
     property string value: ""
+    property string tooltipText: ""
     property color accent: bar.blue
     property int horizontalPadding: 10
     implicitWidth: contents.implicitWidth + horizontalPadding * 2
     implicitHeight: 24
     radius: 5
     color: bar.blockColor
+
+    // HoverHandler observes the pointer without consuming badge clicks or wheel events.
+    HoverHandler { id: badgeHover; enabled: badge.tooltipText.length > 0 }
+
+    PopupWindow {
+      id: tooltip
+      visible: badgeHover.hovered && badge.tooltipText.length > 0
+      anchor.item: badge
+      anchor.rect.x: badge.width / 2
+      anchor.rect.y: badge.height + 8
+      anchor.rect.width: 1
+      anchor.rect.height: 1
+      anchor.edges: Edges.Top
+      anchor.gravity: Edges.Bottom
+      anchor.adjustment: PopupAdjustment.SlideX | PopupAdjustment.FlipY | PopupAdjustment.SlideY
+      implicitWidth: Math.min(420, Math.max(1, bar.width - 16), tooltipLabel.implicitWidth + 24)
+      implicitHeight: Math.min(tooltipLabel.implicitHeight + 20, bar.screen.height - 16)
+      color: "transparent"
+      // Empty input region: no pointer interception and no focus grab.
+      mask: Region {}
+
+      Rectangle {
+        anchors.fill: parent
+        radius: 6
+        color: bar.blockColor
+        border.color: badge.accent
+        clip: true
+
+        Label {
+          id: tooltipLabel
+          anchors.fill: parent
+          anchors.margins: 10
+          anchors.leftMargin: 12
+          anchors.rightMargin: 12
+          text: badge.tooltipText
+          textFormat: Text.PlainText
+          wrapMode: Text.Wrap
+        }
+      }
+    }
 
     Row {
       id: contents
@@ -97,9 +152,33 @@ PanelWindow {
       }
     }
 
-    Badge { icon: "\uf4bc"; value: bar.cpu + "%"; accent: bar.pink }
-    Badge { icon: "\uefc5"; value: bar.memory + "%"; accent: "#cba6f7" }
-    Badge { icon: "\uf0a0"; value: bar.disk + "%"; accent: "#f9e2af" }
+    Badge {
+      icon: "\uf4bc"
+      value: bar.cpu < 0 ? "N/A" : bar.cpu + "%"
+      accent: bar.pink
+      tooltipText: "CPU usage: " + (bar.cpu < 0 ? "waiting for samples" : bar.cpu + "%")
+        + "\nModel: " + (bar.cpuModel || "unavailable")
+        + "\nLogical CPUs: " + (bar.logicalCpus || "unavailable")
+        + "\nLoad (1 / 5 / 15 min): " + (bar.cpuLoad || "unavailable")
+    }
+    Badge {
+      icon: "\uefc5"
+      value: bar.memory < 0 ? "N/A" : bar.memory + "%"
+      accent: "#cba6f7"
+      tooltipText: "Memory: " + (bar.memory < 0 ? "unavailable" : bar.memory + "% used")
+        + "\nUsed: " + bar.formatSize(bar.memoryTotal < 0 ? -1 : bar.memoryTotal - bar.memoryAvailable)
+        + "\nAvailable: " + bar.formatSize(bar.memoryAvailable)
+        + "\nTotal: " + bar.formatSize(bar.memoryTotal)
+    }
+    Badge {
+      icon: "\uf0a0"
+      value: bar.disk < 0 ? "N/A" : bar.disk + "%"
+      accent: "#f9e2af"
+      tooltipText: "Root filesystem (/): " + (bar.disk < 0 ? "unavailable" : bar.disk + "% used")
+        + "\nUsed: " + bar.formatSize(bar.diskUsed)
+        + "\nAvailable: " + bar.formatSize(bar.diskAvailable)
+        + "\nTotal: " + bar.formatSize(bar.diskTotal)
+    }
   }
 
   Row {
@@ -279,14 +358,31 @@ PanelWindow {
     }
   }
 
+  // Hardware identity does not need to be reread on every two-second poll.
+  Process {
+    command: ["cat", "/proc/cpuinfo"]
+    running: true
+    stdout: StdioCollector {
+      onStreamFinished: {
+        const model = text.match(/^(?:model name|Hardware)\s*:\s*(.+)$/m)
+        bar.cpuModel = model ? model[1].trim() : ""
+        const processors = text.match(/^processor\s*:/gm)
+        bar.logicalCpus = processors ? processors.length : 0
+      }
+    }
+  }
+
   Process {
     id: stats
     running: true
+    environment: ({ LC_ALL: "C" })
     command: ["sh", "-c", `
       read tag user nice system idle iowait irq softirq steal rest < /proc/stat
       printf '%s %s\\n' "$((user+nice+system+idle+iowait+irq+softirq+steal))" "$((idle+iowait))"
       cat /proc/meminfo
-      df -P / | tail -n 1
+      df -Pk / | tail -n 1
+      read load1 load5 load15 rest < /proc/loadavg
+      printf 'LOAD %s %s %s\\n' "$load1" "$load5" "$load15"
       for sensor in /sys/class/thermal/thermal_zone*/temp; do
         if [ -r "$sensor" ]; then printf 'TEMP '; cat "$sensor"; break; fi
       done
@@ -301,16 +397,23 @@ PanelWindow {
         const lines = text.split("\n")
         const ticks = lines[0].trim().split(/\s+/).map(Number)
         const elapsed = ticks[0] - bar.previousTotal
-        if (bar.previousTotal > 0 && elapsed > 0)
-          bar.cpu = Math.round(100 * (1 - (ticks[1] - bar.previousIdle) / elapsed))
+        bar.cpu = bar.previousTotal > 0 && elapsed > 0
+          ? Math.max(0, Math.min(100, Math.round(100 * (1 - (ticks[1] - bar.previousIdle) / elapsed)))) : -1
         bar.previousTotal = ticks[0]
         bar.previousIdle = ticks[1]
+        const load = text.match(/^LOAD ([\d.]+) ([\d.]+) ([\d.]+)$/m)
+        bar.cpuLoad = load ? load.slice(1).join(" / ") : ""
         const total = text.match(/MemTotal:\s+(\d+)/)
         const available = text.match(/MemAvailable:\s+(\d+)/)
-        if (total && available)
-          bar.memory = Math.round(100 * (1 - Number(available[1]) / Number(total[1])))
-        const disk = text.match(/^\S+\s+\d+\s+\d+\s+\d+\s+(\d+)%/m)
-        if (disk) bar.disk = Number(disk[1])
+        const memoryReady = total && available && Number(total[1]) > 0
+        bar.memoryTotal = memoryReady ? Number(total[1]) : -1
+        bar.memoryAvailable = memoryReady ? Number(available[1]) : -1
+        bar.memory = memoryReady ? Math.round(100 * (1 - bar.memoryAvailable / bar.memoryTotal)) : -1
+        const disk = text.match(/^\S+\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)%\s+\/$/m)
+        bar.diskTotal = disk ? Number(disk[1]) : -1
+        bar.diskUsed = disk ? Number(disk[2]) : -1
+        bar.diskAvailable = disk ? Number(disk[3]) : -1
+        bar.disk = disk ? Number(disk[4]) : -1
         const temperature = text.match(/TEMP (\d+)/)
         bar.temperature = temperature ? Math.round(Number(temperature[1]) / 1000) : -1
         const audio = text.match(/AUDIO Volume:\s+([\d.]+)([^\n]*)/)
