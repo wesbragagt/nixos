@@ -38,11 +38,9 @@ daemon() {
       pw-record -P '{ application.name = "transcribe" }' "$base.mic.wav" & mic_pid=$!
       pw-record -P '{ application.name = "transcribe" stream.capture.sink = true }' "$base.sys.wav" & sys_pid=$!
       touch "$recording_flag"
-      pkill -RTMIN+9 waybar || true
     elif [ -n "$base" ] && { [ -e "$disabled_flag" ] || ! mic_in_use; }; then
       kill -INT "$mic_pid" "$sys_pid"; wait "$mic_pid" "$sys_pid" || true
       rm -f "$recording_flag"
-      pkill -RTMIN+9 waybar || true
       finish "$base" &
       base=""
     fi
@@ -65,6 +63,6 @@ case "${1:-}" in
   status) status ;;
   toggle)
     if [ -e "$disabled_flag" ]; then rm "$disabled_flag"; else touch "$disabled_flag"; fi
-    pkill -RTMIN+9 waybar || true ;;
+    ;;
   *) echo "usage: transcribe daemon|status|toggle" >&2; exit 1 ;;
 esac

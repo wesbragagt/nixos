@@ -34,7 +34,7 @@ let
     ++ lib.optionals hunkEnabled [ inputs.hunk.homeManagerModules.default ]
     ++ lib.optionals (!isHeadless) [
       ./hyprland
-      ./waybar
+      ./quickshell
       ./wallpaper
       ./zen
       ./swaync.nix

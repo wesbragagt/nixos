@@ -48,7 +48,7 @@ git clone https://github.com/wesbragagt/nixos-config ~/nixos-config
 sudo nixos-rebuild switch --flake ~/nixos-config#$HOST
 ```
 
-After the first switch, `home-manager` activates automatically (it's wired in as a NixOS module). Clone this repo to `~/nixos-config` before first graphical use; Hyprland, Waybar, Neovim, and rofi are intentionally linked from that working tree for live iteration. Add your SSH public key to `users.users.<you>.openssh.authorizedKeys.keys` in `common.nix` (or per-host) before the next push so passwordless SSH from your other machines works.
+After the first switch, `home-manager` activates automatically (it's wired in as a NixOS module). Clone this repo to `~/nixos-config` before first graphical use; Quickshell, Neovim, and rofi use out-of-store links into that working tree for live iteration. Add your SSH public key to `users.users.<you>.openssh.authorizedKeys.keys` in `common.nix` (or per-host) before the next push so passwordless SSH from your other machines works.
 
 ## Layout
 
@@ -56,7 +56,7 @@ After the first switch, `home-manager` activates automatically (it's wired in as
 flake.nix                  # nixosConfigurations + homeConfigurations
 common.nix                 # shared NixOS base (user, locale, packages, services)
 modules/                   # NixOS system modules (graphics, audio, hyprland, ...)
-home/                      # home-manager (wesbragagt.nix entry, programs, hyprland, waybar)
+home/                      # home-manager (wesbragagt.nix entry, programs, hyprland, quickshell)
   npm/                     # npm global prefix/session wiring for ~/.npm-global
 hosts/
   nixos-hp/
@@ -71,8 +71,14 @@ scripts/                   # rofi-freq frequency-sorted launcher
 ```bash
 cd ~/nixos-config
 git add -A   # flake reads from the git tree; untracked files are invisible
-sudo nixos-rebuild switch --flake .#nixos-hp
+rebuild
 ```
+
+## Quickshell bar
+
+Home Manager installs Quickshell and starts `quickshell.service` with the Hyprland session instead of Waybar. `~/.config/quickshell` uses `mkOutOfStoreSymlink` to point at `home/quickshell/config` in the working tree. `shell.qml` creates a `Bar.qml` for each connected screen and recreates bars when monitors return. Edit widgets in `Bar.qml` and `NetworkPanel.qml`; Quickshell reloads QML changes live. Restart with `systemctl --user restart quickshell` if needed.
+
+The imported bar includes workspaces, CPU/memory/disk usage, audio controls, idle control, host-enabled transcription, Wi-Fi settings, Bluetooth status, clock, temperature, and session locking. Idle control shares `idle-control` with Super+Shift+I. The imported design does not include Waybar's media, laptop battery, notification, or system tray widgets.
 
 ## npm global packages
 
@@ -89,7 +95,7 @@ into the system or relying on distro defaults.
 
 ## Use on non-NixOS Linux (home-manager standalone)
 
-CLI/dotfile parts of `home/` work on Ubuntu/Arch/etc. System-level pieces (Hyprland, waybar, Thunar) require NixOS.
+CLI/dotfile parts of `home/` work on Ubuntu/Arch/etc. The desktop configuration (Hyprland, Quickshell, Thunar) is managed for NixOS hosts.
 
 ```bash
 nix run home-manager/master -- switch --flake github:wesbragagt/nixos-config#wesbragagt

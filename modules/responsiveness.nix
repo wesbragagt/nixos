@@ -30,7 +30,7 @@ in
       "--prefer"
       "(^|/)(chrome|chromium|node|bun|java)$"
       "--avoid"
-      "(^|/)(Hyprland|waybar|systemd|sshd|tmux|zsh)$"
+      "(^|/)(Hyprland|quickshell|systemd|sshd|tmux|zsh)$"
     ];
   };
 

@@ -183,7 +183,7 @@ ${wirelessAutostartLine}    exec-once = nwg-dock-hyprland -p bottom -lp end -i 3
         done
 
         if [[ "''${#instances[@]}" -gt 0 ]]; then
-          systemctl --user restart waybar.service || true
+          systemctl --user restart quickshell.service || true
         fi
       fi
     )
@@ -215,10 +215,6 @@ ${wirelessAutostartLine}    exec-once = nwg-dock-hyprland -p bottom -lp end -i 3
         '{ text: $text, class: $class, tooltip: $tooltip }'
     }
 
-    refresh_waybar() {
-      ${pkgs.procps}/bin/pkill -RTMIN+8 waybar 2>/dev/null || true
-    }
-
     case "''${1:-status}" in
       status)
         print_status
@@ -232,7 +228,6 @@ ${wirelessAutostartLine}    exec-once = nwg-dock-hyprland -p bottom -lp end -i 3
           ${pkgs.systemd}/bin/systemctl --user start "$service"
           ${pkgs.libnotify}/bin/notify-send "Idle enabled" "Lock, screen-off, and suspend timers are active." || true
         fi
-        refresh_waybar
         print_status
         ;;
       *)
