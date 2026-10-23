@@ -32,7 +32,7 @@ ShellRoot {
         state.answer = "# A readable answer\n\n**Markdown**, with a source [Qt TextEdit](https://doc.qt.io/qt-6/qml-qtquick-textedit.html).\n\n- First point\n- Second point\n\n```qml\nTextEdit { textFormat: TextEdit.MarkdownText }\n```\n\n| Setting | Value |\n|---|---|\n| Protocol | ACP |\n\n" + "A long reading paragraph with content to exercise scrolling. ".repeat(100) + "\n\n" + "LongToken".repeat(60)
       },
       () => {
-        if (widget.answerEdit.text.length < 100) return false
+        if (widget.answerEdit.text.length < 100 || widget.answerEdit.contentHeight < 40) return false
         widget.answerEdit.selectAll()
         t.verify(widget.answerEdit.selectedText.indexOf("A readable answer") >= 0, "heading rendered as selectable text")
         t.verify(widget.answerEdit.selectedText.indexOf("**Markdown**") < 0, "emphasis delimiters not rendered")

@@ -6,7 +6,7 @@ root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 if (($#)); then
   scenarios=("$@")
 else
-  scenarios=(runner helpers core network layout microphone questions questions-errors questions-deadlines questions-transport questions-transport-errors questions-render questions-input)
+  scenarios=(runner helpers core network layout microphone questions questions-errors questions-deadlines questions-transport questions-transport-errors questions-render questions-input questions-markdown questions-history questions-history-ui)
 fi
 for scenario in "${scenarios[@]}"; do
   log=$(mktemp)
@@ -21,3 +21,4 @@ for scenario in "${scenarios[@]}"; do
   trap - EXIT
 done
 bun "$root/questions-web-only.ts"
+bun "$root/questions-history.mjs"

@@ -1,10 +1,42 @@
 import QtQuick
 import Quickshell
+import "../../shared" as Shared
+import Quickshell.Hyprland
 
 Item {
   id: state
 
   property var transport: AcpTransport {}
+  property var browser: Shared.CommandRunner {}
+  property var mover: Shared.CommandRunner {}
+  property var compositor: Hyprland
+  property int _linkWorkspace: 0
+
+  // Source links always open in a new Chromium window on the workspace that was focused at the click.
+  // Chromium may map the window elsewhere, so the window is moved there once it appears.
+  function openUrl(url) {
+    if (!/^https?:\/\//i.test(String(url))) return false
+    const focused = compositor && compositor.focusedWorkspace
+    if (!browser.launchDetached(["chromium", "--new-window", String(url)])) return false
+    _linkWorkspace = focused ? focused.id : 0
+    if (_linkWorkspace > 0) linkTimer.restart()
+    return true
+  }
+
+  Timer { id: linkTimer; interval: 8000; onTriggered: state._linkWorkspace = 0 }
+  Connections {
+    target: state.compositor
+    function onRawEvent(event) {
+      if (event.name !== "openwindow" || state._linkWorkspace <= 0) return
+      // openwindow>>address,workspace,class,title
+      const fields = event.data.split(",")
+      if (!/^chromium/i.test(fields[2] || "")) return
+      const workspace = state._linkWorkspace
+      state._linkWorkspace = 0
+      linkTimer.stop()
+      if (fields[1] !== String(workspace)) state.mover.launchDetached(["hyprctl", "dispatch", "movetoworkspace", workspace + ",address:0x" + fields[0]])
+    }
+  }
   property string question: ""
   property string submittedQuestion: ""
   property string answer: ""
@@ -79,7 +111,8 @@ Item {
     turnTimer.restart()
     const argv = [ompExecutable, "acp", "--allow-home", "--no-title", "--no-extensions",
       "--extension", webOnlyExtensionPath, "--no-skills", "--no-rules", "--no-lsp",
-      "--no-pty", "--tools", "web_search,read", "--system-prompt", questionSystemPrompt]
+      "--no-pty", "--tools", "web_search,read", "--model", "ccflare/gpt-6-luna", "--thinking", "low",
+      "--system-prompt", questionSystemPrompt]
     if (!transport.start(argv, _home)) {
       if (busy) _fail("OMP could not start. Check the configured executable.")
       return false

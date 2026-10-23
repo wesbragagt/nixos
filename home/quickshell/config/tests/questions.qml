@@ -3,8 +3,15 @@ import Quickshell
 import "../features/questions" as Questions
 
 ShellRoot {
+  FakeRunner { id: browser }
+  FakeRunner { id: mover }
+  QtObject {
+    id: compositor
+    property var focusedWorkspace: ({id: 4})
+    signal rawEvent(var event)
+  }
   FakeAcpTransport { id: wire }
-  Questions.State { id: state; transport: wire }
+  Questions.State { id: state; transport: wire; browser: browser; mover: mover; compositor: compositor }
   function begin(id) {
     wire.started()
     wire.reply({protocolVersion: 1, agentCapabilities: {sessionCapabilities: {close: {}}}})
@@ -21,6 +28,9 @@ ShellRoot {
       () => {
         t.verify(!state.submit("  "), "blank questions rejected")
         t.verify(state.submit("first question"), "first question accepted")
+        const launch = wire.launches[0].argv
+        t.equal(launch[launch.indexOf("--model") + 1], "ccflare/gpt-6-luna", "questions always use the pinned model")
+        t.equal(launch[launch.indexOf("--thinking") + 1], "low", "questions use low thinking effort")
         t.verify(!state.submit("overlap"), "overlap rejected")
         begin("first")
         wire.chunk("first", "Looking up", "preamble")
@@ -72,6 +82,19 @@ ShellRoot {
           settle(reason)
           t.equal(state.outcome, reason === "refusal" ? "refused" : "incomplete", "empty/limited result remains explicit: " + reason)
         }
+        t.verify(state.openUrl("https://doc.qt.io/"), "https source link launches")
+        t.equal(browser.detachedCalls[0].argv.join(" "), "chromium --new-window https://doc.qt.io/", "links open in a new Chromium window")
+        t.verify(!state.openUrl("file:///etc/passwd") && browser.detachedCalls.length === 1, "non-HTTP(S) links never launch")
+        compositor.rawEvent({name: "openwindow", data: "aaa,4,foot,term"})
+        compositor.rawEvent({name: "openwindow", data: "abc,3,chromium-browser,Qt, Docs"})
+        t.equal(mover.detachedCalls.length, 1, "only the new Chromium window is moved")
+        t.equal(mover.detachedCalls[0].argv.join(" "), "hyprctl dispatch movetoworkspace 4,address:0xabc", "window moves to the clicked workspace")
+        compositor.rawEvent({name: "openwindow", data: "def,3,chromium-browser,Other"})
+        t.equal(mover.detachedCalls.length, 1, "later windows are left alone")
+        compositor.focusedWorkspace = {id: 6}
+        state.openUrl("https://example.com/")
+        compositor.rawEvent({name: "openwindow", data: "ghi,6,chromium-browser,Example"})
+        t.equal(mover.detachedCalls.length, 1, "a window already on the workspace is not moved")
       }
     ]
   }

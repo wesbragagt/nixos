@@ -57,6 +57,14 @@ ShellRoot {
       },
       () => {
         t.equal(opened, "https://doc.qt.io/", "native link activation reaches filtered opener")
+        widget.focusInput()
+        widget.answerEdit.select(0, 2)
+        widget.copyAnswer()
+        t.verify(widget.input.activeFocus, "Copy answer restores question focus")
+        t.equal(widget.answerEdit.selectedText, "Qt", "Copy answer restores selected text")
+        widget.input.clear()
+        widget.input.paste()
+        t.equal(widget.input.text.trim(), "Qt documentation", "clipboard contains rendered answer rather than Markdown")
         widget.answerEdit.forceActiveFocus()
         keys.keyClick(Qt.Key_Escape)
         t.equal(closes, 2, "Escape closes from answer selection")
