@@ -8,14 +8,14 @@
 }:
 buildNpmPackage (finalAttrs: {
   pname = "pi-coding-agent";
-  version = "18.10.2";
+  version = "18.12.6";
 
   src = fetchzip {
     url = "https://registry.npmjs.org/@oh-my-pi/pi-coding-agent/-/pi-coding-agent-${finalAttrs.version}.tgz";
-    hash = "sha256-EohZlGhPvC2GY8CsYHxgCmDVLzL3MkTPSXaIcCgEBv4=";
+    hash = "sha256-bZMdYNai/C3tNcAQitgn1M/eVXo/aEJFpq8mQxXSz7U=";
   };
 
-  npmDepsHash = "sha256-yipRr3r1feehEyXJ/AiL29Gr1UKC79vvVT+/FxN8Odo=";
+  npmDepsHash = "sha256-r3dKq5Q9rudBkn+yUasJWUekl1k9JpFgudc5YDV/e88=";
   forceEmptyCache = true;
 
   postPatch = ''
