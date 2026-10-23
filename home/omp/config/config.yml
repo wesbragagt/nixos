@@ -1,7 +1,9 @@
 setupVersion: 2
+defaultThinkingLevel: low
 modelRoles:
-  default: ccflare/gpt-6-luna:low
+  default: ccflare/claude-sonnet-5-5:low
   web: web/exa
+  advisor: ccflare/gpt-6.1-sol
 statusLine:
   preset: custom
   rightSegments:
@@ -57,3 +59,5 @@ retry:
       - web/mojeek
       - web/public
 extendedContext: true
+codexResets:
+  autoRedeem: "yes"
