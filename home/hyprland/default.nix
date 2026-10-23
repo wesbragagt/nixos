@@ -107,6 +107,7 @@ ${kbOptionsLine}      repeat_delay = 250
     bind = $mod, M, exec, rofi-bookmarks
     bind = $mod SHIFT, M, exec, edit-bookmarks
     bind = $mod, Space, exec, $menu
+    bind = $mod, slash, exec, quickshell ipc --path "$HOME/.config/quickshell" call questions toggle
     bind = $mod, Escape, exec, loginctl lock-session
     bind = $mod, F, fullscreen,
     bind = $mod, V, exec, clipboard-selector

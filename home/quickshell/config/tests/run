@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+set -euo pipefail
+root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+# Offscreen configurations create no live desktop bars and execute no feature commands.
+# Additional scenarios may import TestHarness and controlled dependencies here.
+if (($#)); then
+  scenarios=("$@")
+else
+  scenarios=(runner helpers core network layout microphone questions questions-errors questions-deadlines questions-transport questions-transport-errors questions-render questions-input)
+fi
+for scenario in "${scenarios[@]}"; do
+  log=$(mktemp)
+  trap 'rm -f "$log"' EXIT
+  QT_QPA_PLATFORM=offscreen QT_QUICK_BACKEND=software QUICKSHELL_TEST_SCENARIO="$scenario" timeout 20s \
+    quickshell --no-color --path "$root/../behavior.qml" 2>&1 | tee "$log"
+  if ! python3 -c 'import sys; text=open(sys.argv[1]).read(); sys.exit(0 if "BEHAVIOR PASS:" in text and "FAIL:" not in text and "Failed to load configuration" not in text else 1)' "$log"; then
+    printf 'Behavior scenario failed: %s\n' "$scenario" >&2
+    exit 1
+  fi
+  rm -f "$log"
+  trap - EXIT
+done
+bun "$root/questions-web-only.ts"

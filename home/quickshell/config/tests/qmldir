@@ -1,0 +1,5 @@
+TestHarness 1.0 TestHarness.qml
+FakeRunner 1.0 FakeRunner.qml
+CoreTests 1.0 core.qml
+NetworkTests 1.0 network.qml
+FakeAcpTransport 1.0 FakeAcpTransport.qml

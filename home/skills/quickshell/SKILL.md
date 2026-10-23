@@ -8,7 +8,9 @@ description: Develop, edit, debug, and operate the user's Quickshell bar and QML
 ## Working files
 
 - Repo root is `~/nixos-config`. Home Manager wiring lives in `home/quickshell/default.nix`.
-- `home/quickshell/config/shell.qml` creates one `Bar.qml` per screen through `Variants` and `Quickshell.screens`. Edit bar widgets in `Bar.qml`; `NetworkPanel.qml` owns the Wi-Fi popup. Keep this per-screen lifecycle so bars are recreated when monitors return.
+- Root `home/quickshell/config/shell.qml` owns one ordinary shared State per feature outside `Variants`, and creates `layouts/Bar.qml` per physical screen through `Quickshell.screens`. Layout owns only window geometry, placement, dependency forwarding, and local popup focus. Keep this lifecycle: monitor removal destroys widgets, not shared collectors/history.
+- `features/<feature>/Widget.qml` owns presentation/local interaction; `State.qml` owns data, parsing, polling and actions. Network uses `features/network/{NetworkWidget,NetworkState,NetworkPanel}.qml`. Do not restore obsolete root Bar/NetworkPanel files.
+- `shared/Theme.qml` is the only singleton and owns colors/fonts. `shared/Badge.qml`, `Label.qml`, and `CommandRunner.qml` own reusable visuals/process behavior. Other State and dependencies are explicitly injected.
 - `~/.config/quickshell` resolves through Home Manager's `mkOutOfStoreSymlink` to the repo's `home/quickshell/config` directory. Edit the working-tree files, not a Nix store copy or `/tmp/quickshell`.
 - Shared skill source is `home/skills/quickshell/SKILL.md`. Home Manager exposes it through `~/.claude/skills`, also used by OMP.
 
@@ -22,11 +24,19 @@ Package, Home Manager, and service changes require `git add -A` followed by `reb
 
 ## Develop a widget
 
-1. Read the current QML and module before editing. Preserve the existing badge colors, spacing, font, and interactions unless asked to change them. Keep reusable QML components beside `shell.qml`; component filenames start with a capital letter.
-2. Use Qt Quick bindings for derived display values, explicit properties for state, and signals for actions. Reuse the existing `Badge` and `Label` components for bar items. Use Quickshell APIs for compositor data, such as `Quickshell.Hyprland`, rather than polling a command when an existing API covers the need. Consult the installed version's API documentation before adding unfamiliar types or properties.
-3. For external commands, use `Quickshell.Io.Process` with argument arrays and `StdioCollector` for output. Do not launch overlapping polls; check `running` before starting again. Use `Quickshell.execDetached` for independent app launches. Keep secrets out of command arguments and logs. Declare new runtime packages in `home/quickshell/default.nix`.
+1. Read the relevant feature, layout and shared module before editing. Preserve badge colors, spacing, font and interactions unless asked. Put reusable helpers in `shared/`, not beside `shell.qml`; component filenames start with a capital letter.
+2. Follow Layout <- Widget <- State <- Process for data and Widget -> State -> runner/native source for actions. Widgets receive State (`featureState`, or network's `networkState`); they do not execute/parse commands or reference native providers/private layout IDs. Reuse shared Badge/Label and Theme. Workspace/clock States inject native sources (Hyprland/SystemClock defaults), not CLI polls.
+3. Inject a separate `Shared.CommandRunner` per independent operation into State. Use `start(argv, stdin?, environment?)` and `launchDetached(argv, environment?)`; commands are argument arrays, busy starts skip without overlap, and `completed(result)` publishes fully collected stdout/stderr, exitCode/exitStatus/failedToStart. The runner supplies English `LC_ALL=C.UTF-8`; never put secrets in argv/logs/files/shared properties. Network passwords are transient stdin, cleared locally on send, close or cancel. Shared network scan/connection/radio state must not absorb monitor-local popup visibility, selection, password, reveal or focus. Each open popup registers scan demand; one closing must not stop another's scan timer.
 4. Reuse `idle-control status/toggle` for idle behavior so the badge agrees with Super+Shift+I. Use `transcribe status/toggle` only when `QUICKSHELL_TRANSCRIBE=1`; the transcription service owns recording. Preserve host feature gating. Use the English UTF-8 service locale for parsed command output.
 5. Save and verify hot reload, then exercise the changed interaction on the real desktop. Check empty, unavailable, or disconnected states relevant to the widget. Do not toggle connectivity, lock the session, or start recording merely to test rendering. Do not claim unexercised behavior works.
+
+Microphone `features/microphone/State.qml` calls `mic-noise status/toggle/preset/restart`; `home/mic-noise/` owns the independent audio service and virtual `CleanMicrophone` source. Preserve raw passthrough when disabled and shared state across monitors. Never start capture from QML initialization. The runtime model download is pinned and hash-checked; weights stay outside the repo and Nix closure. Settings and verified model cache survive UI reloads.
+
+## Controlled behavior checks
+
+From the repository root, run `home/quickshell/config/tests/run` for the complete suite. Optional scenario arguments are `runner helpers core network layout`. It uses installed Quickshell with an offscreen platform and software rendering; `behavior.qml` is the test-only entrypoint, not a second desktop bar. Real runner fixtures are harmless; mutation tests use `tests/FakeRunner.qml` and synthetic credentials only.
+
+Inject runners and native workspace/clock sources before construction, and set `pollingEnabled: false` on polling States before creation. This suppresses automatic initial/timer commands; explicit `refresh()` and actions remain usable. Production status timers run every two seconds; network scan cadence is ten seconds while any popup is open. Shared State survives widget recreation, but full reload reconstructs it. Test meaningful transitions, failures, busy exclusion and shared lifetime; offscreen tests do not prove real Wayland focus or rendering.
 
 ## Operate and inspect
 
@@ -44,4 +54,4 @@ For visual proof, capture the affected monitor or bar with `grim` using its actu
 
 ## Current scope
 
-The imported bar has workspaces, resource usage, volume, idle, optional transcription, network settings, Bluetooth status, clock, temperature, and session locking. Waybar's media, laptop battery, notifications, and system tray widgets are not yet ported. Do not silently restore Waybar or claim those widgets exist. Add them only when requested, using the same live-edit workflow.
+The bar has launcher, workspaces, resource usage, volume, idle, optional transcription, network settings, Bluetooth status, clock, and session locking. All bars display every workspace and globally focused highlighting. Waybar's media, laptop battery, notifications, and system tray widgets are not yet ported. Do not silently restore Waybar or claim those widgets exist. Add them only when requested, using the same live-edit workflow.

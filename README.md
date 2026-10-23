@@ -76,11 +76,33 @@ rebuild
 
 ## Quickshell bar
 
-Home Manager installs Quickshell and starts `quickshell.service` with the Hyprland session instead of Waybar. `~/.config/quickshell` uses `mkOutOfStoreSymlink` to point at `home/quickshell/config` in the working tree. `shell.qml` creates a `Bar.qml` for each connected screen and recreates bars when monitors return. Edit widgets in `Bar.qml` and `NetworkPanel.qml`; Quickshell reloads QML changes live. Restart with `systemctl --user restart quickshell` if needed.
+Home Manager installs Quickshell and starts `quickshell.service` with the Hyprland session instead of Waybar. `~/.config/quickshell` uses `mkOutOfStoreSymlink` to point at `home/quickshell/config` in the working tree. Root `shell.qml` owns one shared State per feature outside `Variants` and creates `layouts/Bar.qml` per physical screen. The layout handles only window geometry, placement, dependency forwarding, and local popup focus; monitor removal/recreation does not reset shared data or duplicate collectors.
 
-The imported bar includes workspaces, CPU/memory/disk usage, audio controls, idle control, host-enabled transcription, Wi-Fi settings, Bluetooth status, clock, temperature, and session locking. Idle control shares `idle-control` with Super+Shift+I. The imported design does not include Waybar's media, laptop battery, notification, or system tray widgets.
+The bar includes launcher, workspaces, CPU/memory/disk usage, audio controls, idle control, host-enabled transcription, Wi-Fi settings, Bluetooth status, clock, and session locking. Idle control shares `idle-control` with Super+Shift+I. The design does not include Waybar's media, laptop battery, notification, or system tray widgets.
 
-Hover over CPU, memory, or disk badges for details. CPU shows its model, logical CPU count, usage, and load averages. Memory shows used, available, and total capacity. Disk shows root filesystem usage and capacity. Values refresh with the bar's two-second resource poll; moving the pointer away dismisses the tooltip.
+Edit feature presentation and interactions in `features/<feature>/Widget.qml` and data/actions in `State.qml` (network uses `NetworkWidget.qml`, `NetworkState.qml`, and feature-local `NetworkPanel.qml`). Data flows Layout <- Widget <- State <- Process; actions go through State. Network connection/scan data is shared, while popup visibility, selection, password, reveal, and focus are local to each monitor. Credentials use stdin only and clear on send/close/cancel. `shared/Theme.qml` owns colors/fonts; `shared/Badge.qml`, `Label.qml`, and `CommandRunner.qml` supply reusable visuals and independent command runners.
+
+Hover over CPU, memory, or disk badges for details: CPU model/count/usage/load, memory used/available/total, and root filesystem capacity. Each polling State owns its two-second timer and `refresh()`; the shared network scan runs every ten seconds while any popup is open. All bars display all workspaces and global focus. State survives monitor-widget recreation but a full QML reload reconstructs it.
+
+Run `home/quickshell/config/tests/run` from the repository root for all isolated offscreen behavior checks, or pass `runner`, `helpers`, `core`, `network`, or `layout`. Tests inject fake runners/native workspace/clock sources and set `pollingEnabled: false` before State construction, then call refresh/actions explicitly. The suite also exercises harmless actual processes, QtTest pointer gestures, Theme propagation, and two-widget-set lifetimes; it creates no additional desktop bar and performs no real connectivity/lock/recording actions. `behavior.qml` is the test-only entrypoint.
+
+QML edits hot reload without a rebuild or second `qs` process. Check `journalctl --user -u quickshell.service -b -n 60 --no-pager` for a new `Configuration Loaded` and no QML/import errors; a visible old bar alone is not proof. Restart only a stopped/stuck service or after service-environment changes. Exercise safe desktop interactions and use `hyprctl monitors -j`, `hyprctl layers -j`, and geometry-matched `grim` captures; report unavailable image inspection or physical multi-monitor proof explicitly.
+
+### OMP questions
+
+Press Super+/ to toggle the floating question panel on the focused monitor. Enter asks; Shift+Enter inserts a line. Responses stream as selectable Markdown with HTTP(S) source links. Copy answer copies rendered text. Escape/Close hides without cancelling; Stop cancels the request. New question clears the displayed answer, not saved history.
+
+Each submission opens an independent native OMP ACP session using the existing model and credentials. Normal OMP history stays saved. Tools are limited to web search and HTTP(S) page reads by `features/questions/WebOnly.ts`; this is not an OS sandbox. The service resolves OMP through `QUICKSHELL_OMP`, set to `~/.bun/bin/omp`. Missing executables, protocol errors and deadlines appear in the panel rather than falling back to print mode.
+
+Run `home/quickshell/config/tests/run questions questions-errors questions-deadlines questions-transport questions-transport-errors questions-render questions-input` for isolated lifecycle, deadlines, process framing, rendering, keyboard, clipboard, native source-link and web-only checks. The complete suite includes these scenarios. The screen-lifetime fixture requires Wayland: `QT_QPA_PLATFORM=wayland QUICKSHELL_TEST_SCENARIO=questions-window quickshell --path home/quickshell/config/behavior.qml`.
+
+### Microphone noise suppression
+
+Click the microphone badge beside speaker volume to enable suppression, use raw bypass, choose Light/Balanced/Strong, or restart a failed processor. Select `CleanMicrophone` in the calling app; this feature does not change your system default input. `mic-noise status` reports the processor state. `mic-noise toggle`, `mic-noise preset Balanced`, and `mic-noise restart` provide the same controls from a terminal.
+
+`home/mic-noise/` owns the independent user service and persistent virtual source. FFmpeg processes audio locally with `arnndn`; the three presets blend 50%, 75%, or 100% processed audio. Bypass sends raw microphone audio, not silence or mute. Toggle/preset/source changes restart the FFmpeg stream with a brief interruption while the virtual microphone remains present. Source removal or processor failure produces an error and requires manual restart; there is no automatic retry loop. Do not select a desktop monitor as the physical default source.
+
+On first startup the service downloads the pinned `bd.rnnn` model from [arnndn-models](https://github.com/richardpl/arnndn-models) over HTTPS and verifies SHA-256. It caches the model under `$XDG_CACHE_HOME/mic-noise` and saves settings under `$XDG_STATE_HOME/mic-noise`, defaulting to `~/.cache` and `~/.local/state`. Cached verified weights work offline. The weights are not bundled in the repository or Nix closure. Upstream has no explicit model redistribution license; runtime downloading does not resolve that ambiguity. Audio is streamed only, never saved or uploaded by this feature. Suppression quality and latency depend on the microphone and model; Soundveil-equivalent performance is not claimed.
 
 ## npm global packages
 
