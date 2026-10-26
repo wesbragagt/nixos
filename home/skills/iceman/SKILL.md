@@ -1,6 +1,7 @@
 ---
 name: iceman
-description: Use the iceman CLI to create and edit Nix flake development environments, find nixpkgs packages, or install iceman guidance into a project. Activate when a user wants a reproducible project dev shell or needs to change its flake dependencies.
+description: Use the iceman CLI to create and edit Nix flake development environments.
+disable-model-invocation: true
 ---
 
 # Iceman

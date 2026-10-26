@@ -1,9 +1,10 @@
 setupVersion: 2
 defaultThinkingLevel: low
 modelRoles:
-  default: ccflare/claude-sonnet-5-5:low
+  default: ccflare/claude-opus-5-5:medium
   web: web/exa
   advisor: ccflare/gpt-6.1-sol
+  smol: ccflare/claude-sonnet-5-5:medium
 statusLine:
   preset: custom
   rightSegments:
