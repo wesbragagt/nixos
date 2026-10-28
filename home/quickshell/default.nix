@@ -30,6 +30,7 @@
     Service = {
       Environment = [
         "QUICKSHELL_TRANSCRIBE=${if hostProfile.features.transcribe or false then "1" else "0"}"
+        "QUICKSHELL_DICTATE=${if hostProfile.features.dictate or false then "1" else "0"}"
         "LC_ALL=C.UTF-8"
       ];
       RestartSec = 1;

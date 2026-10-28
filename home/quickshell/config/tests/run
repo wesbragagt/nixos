@@ -6,7 +6,7 @@ root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 if (($#)); then
   scenarios=("$@")
 else
-  scenarios=(runner helpers core network layout microphone questions questions-errors questions-deadlines questions-transport questions-transport-errors questions-render questions-input questions-markdown questions-history questions-history-ui)
+  scenarios=(runner helpers core network layout microphone dictation questions questions-errors questions-deadlines questions-transport questions-transport-errors questions-render questions-input questions-markdown questions-history questions-history-ui)
 fi
 for scenario in "${scenarios[@]}"; do
   log=$(mktemp)

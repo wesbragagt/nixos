@@ -7,6 +7,7 @@ import "features/audio" as Audio
 import "features/microphone" as Microphone
 import "features/idle" as Idle
 import "features/transcription" as Transcription
+import "features/dictation" as Dictation
 import "features/network" as Network
 import "features/bluetooth" as Bluetooth
 import "features/clock" as Clock
@@ -21,6 +22,7 @@ ShellRoot {
   Microphone.State { id: microphone }
   Idle.State { id: idle }
   Transcription.State { id: transcription }
+  Dictation.State { id: dictation }
   Network.NetworkState { id: network }
   Bluetooth.State { id: bluetooth }
   Clock.State { id: clock }
@@ -41,6 +43,7 @@ ShellRoot {
       microphoneState: microphone
       idleState: idle
       transcriptionState: transcription
+      dictationState: dictation
       networkState: network
       bluetoothState: bluetooth
       clockState: clock

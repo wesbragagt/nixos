@@ -17,6 +17,7 @@ let
   ompEnabled = features.omp or false;
   mnemosyneEnabled = features.mnemosyne or false;
   transcribeEnabled = features.transcribe or false;
+  dictateEnabled = features.dictate or false;
   hunkEnabled = hostProfile.hunkEnabled or true;
   base = {
     imports = [
@@ -40,7 +41,8 @@ let
       ./swaync.nix
       inputs.zen-browser.homeModules.beta
     ]
-    ++ lib.optionals (!isHeadless && transcribeEnabled) [ ./transcribe ];
+    ++ lib.optionals (!isHeadless && transcribeEnabled) [ ./transcribe ]
+    ++ lib.optionals (!isHeadless && dictateEnabled) [ ./dictate ];
 
     home.username = "wesbragagt";
     home.homeDirectory = homeDirectory;
