@@ -290,8 +290,17 @@ Item {
           objectName: "historyToggle"
           glyph: "\uf1da"
           text: root.historyVisible ? "Current answer" : "History"
-          ToolTip.visible: hovered
-          ToolTip.text: "Toggle saved history (Ctrl+H)"
+          ToolTip {
+            id: historyTip
+            visible: parent.hovered
+            text: "Toggle saved history (Ctrl+H)"
+            contentItem: Text {
+              text: historyTip.text
+              color: Shared.Theme.foreground
+              font { family: Shared.Theme.fontFamily; pixelSize: 12 }
+            }
+            background: Rectangle { radius: 6; color: Shared.Theme.block; border.color: Shared.Theme.blue }
+          }
           onClicked: root.toggleHistory()
         }
       }
@@ -348,7 +357,7 @@ Item {
           keyNavigationEnabled: true
           Keys.onReturnPressed: event => { root.chooseHistoryResult(); event.accepted = true }
           Keys.onEnterPressed: event => { root.chooseHistoryResult(); event.accepted = true }
-          ScrollBar.vertical: ScrollBar { policy: ScrollBar.AsNeeded }
+          ScrollBar.vertical: Shared.ThemedScrollBar {}
           delegate: ItemDelegate {
             id: historyRow
             required property var modelData
@@ -397,6 +406,7 @@ Item {
           clip: true
           contentWidth: availableWidth
           ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
+          ScrollBar.vertical: Shared.ThemedScrollBar {}
           TextArea {
             id: questionInput
             objectName: "questionInput"
@@ -522,6 +532,7 @@ Item {
             clip: true
             contentWidth: availableWidth
             ScrollBar.horizontal.policy: ScrollBar.AlwaysOff
+            ScrollBar.vertical: Shared.ThemedScrollBar {}
             TextArea {
               objectName: "savedQuestion"
               text: root.selectedHistory ? root.selectedHistory.question : ""

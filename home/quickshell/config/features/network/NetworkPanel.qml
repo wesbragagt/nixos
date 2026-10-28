@@ -117,9 +117,23 @@ PopupWindow {
           font { family: Shared.Theme.fontFamily; pixelSize: Shared.Theme.iconFontSize }
         }
         Switch {
+          id: wifiSwitch
           checked: panel.networkState.wifiEnabled
           enabled: !panel.networkState.radioBusy && !panel.networkState.loading && !panel.networkState.connecting
           onClicked: panel.networkState.toggleRadio()
+          indicator: Rectangle {
+            implicitWidth: 38; implicitHeight: 20; radius: 10
+            x: wifiSwitch.leftPadding; y: (wifiSwitch.height - height) / 2
+            color: wifiSwitch.checked ? Shared.Theme.blue : Shared.Theme.inputBackground
+            border.color: wifiSwitch.checked ? Shared.Theme.blue : Shared.Theme.hover
+            opacity: wifiSwitch.enabled ? 1 : 0.5
+            Rectangle {
+              width: 14; height: 14; radius: 7
+              x: wifiSwitch.checked ? parent.width - width - 3 : 3
+              anchors.verticalCenter: parent.verticalCenter
+              color: wifiSwitch.checked ? Shared.Theme.block : Shared.Theme.muted
+            }
+          }
         }
       }
       Text {
@@ -133,6 +147,7 @@ PopupWindow {
         visible: panel.networkState.wifiEnabled && panel.networkState.networks.length > 0
         clip: true
         contentWidth: availableWidth
+        ScrollBar.vertical: Shared.ThemedScrollBar {}
         Column {
           id: networkList
           width: parent.width

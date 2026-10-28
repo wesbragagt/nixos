@@ -2,3 +2,5 @@ singleton Theme 1.0 Theme.qml
 Badge 1.0 Badge.qml
 Label 1.0 Label.qml
 CommandRunner 1.0 CommandRunner.qml
+OptionButton 1.0 OptionButton.qml
+ThemedScrollBar 1.0 ThemedScrollBar.qml

@@ -52,7 +52,7 @@ Shared.Badge {
           font.family: Shared.Theme.fontFamily
           font.pixelSize: Shared.Theme.smallFontSize
         }
-        Button {
+        Shared.OptionButton {
           text: widget.featureState.enabled ? "Use raw microphone" : "Enable suppression"
           enabled: !widget.featureState.busy && widget.featureState.status === "running"
           onClicked: widget.featureState.toggle()
@@ -60,10 +60,10 @@ Shared.Badge {
         RowLayout {
           Repeater {
             model: ["Light", "Balanced", "Strong"]
-            Button {
+            Shared.OptionButton {
               required property string modelData
               text: modelData
-              highlighted: widget.featureState.preset === modelData
+              selected: widget.featureState.preset === modelData
               enabled: !widget.featureState.busy && widget.featureState.status === "running"
               onClicked: widget.featureState.setPreset(modelData)
             }
@@ -77,7 +77,7 @@ Shared.Badge {
           font.family: Shared.Theme.fontFamily
           font.pixelSize: Shared.Theme.smallFontSize
         }
-        Button { text: "Restart processor"; enabled: !widget.featureState.busy; onClicked: widget.featureState.restart() }
+        Shared.OptionButton { text: "Restart processor"; enabled: !widget.featureState.busy; onClicked: widget.featureState.restart() }
       }
     }
   }
