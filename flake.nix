@@ -41,7 +41,7 @@
     };
     t3code-src = {
       # Change this pointer to build a personal fork.
-      url = "github:pingdotgg/t3code/v0.0.40";
+      url = "github:pingdotgg/t3code/v0.1.3";
       flake = false;
     };
     chromium-webapps = {

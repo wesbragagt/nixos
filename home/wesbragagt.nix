@@ -178,6 +178,13 @@ let
           startupWMClass = "chrome-discord.com__app-Default";
           icon = "chromium";
         };
+        t3code = mkChromiumWebApp {
+          name = "T3Code";
+          url = "http://127.0.0.1:3773";
+          port = 9227;
+          startupWMClass = "chrome-127.0.0.1__-Default";
+          icon = "chromium";
+        };
       in
       [
         excalidraw.package
@@ -188,6 +195,8 @@ let
         whatsapp.desktopEntry
         discord.package
         discord.desktopEntry
+        t3code.package
+        t3code.desktopEntry
       ];
   };
 in

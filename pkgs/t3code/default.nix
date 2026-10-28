@@ -27,6 +27,9 @@ stdenv.mkDerivation (finalAttrs: let
   appName = "T3 Code";
   electron = electron_43;
   pnpm = pnpm_11;
+  # Prebuilt node-pty binaries need libstdc++, which NixOS does not expose to GUI-launched processes.
+  runtimeLibs = lib.optionalString stdenv.hostPlatform.isLinux
+    "--prefix LD_LIBRARY_PATH : ${lib.makeLibraryPath [ stdenv.cc.cc.lib ]}";
   desktopIcon =
     if stdenv.hostPlatform.isDarwin then
       "assets/prod/black-macos-1024.png"
@@ -78,15 +81,17 @@ in {
   pnpmDeps = fetchPnpmDeps {
     inherit pnpm;
     pname = "t3code-deps";
-    version = "0.0.40";
+    version = "0.1.3";
     src = t3codeSrc;
     inherit (finalAttrs) pnpmWorkspaces;
     fetcherVersion = 4;
-    hash = "sha256-+UsoURSM4VP+CgF1fWROBEB85EuH+iJJM/xDPFigCKk=";
+    hash = "sha256-t7DWJow4pdsqbFnMA+p3TDjYkr1asdFStnvnDxuxnFw=";
   };
 
   preBuild = ''
     export pnpm_config_verify_deps_before_run=false
+    # The third-party-licenses vite plugin fetches from the network, which the sandbox blocks.
+    export T3CODE_BUILT_DEV=1
     node scripts/update-release-package-versions.ts ${finalAttrs.version}
     export npm_config_nodedir=${nodejs}
     export ELECTRON_SKIP_BINARY_DOWNLOAD=1
@@ -119,10 +124,12 @@ in {
     find "$out"/libexec/t3code -xtype l -delete
 
     makeWrapper ${lib.getExe nodejs} "$out"/bin/t3 \
-      --add-flags "$out"/libexec/t3code/apps/server/dist/bin.mjs
+      --add-flags "$out"/libexec/t3code/apps/server/dist/bin.mjs \
+      ${runtimeLibs}
     makeWrapper ${lib.getExe electron} "$out"/bin/t3code-desktop \
       --add-flags "$out"/libexec/t3code/apps/desktop \
-      --inherit-argv0
+      --inherit-argv0 \
+      ${runtimeLibs}
   '' + lib.optionalString stdenv.hostPlatform.isDarwin ''
     find "$out"/libexec/t3code \
       -path '*/node-pty/prebuilds/darwin-*/spawn-helper' \
