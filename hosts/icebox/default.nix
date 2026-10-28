@@ -1,12 +1,7 @@
-{ lib, pkgs, inputs, ... }:
+{ lib, pkgs, ... }:
 
 let
   hardwareConfig = ./hardware-configuration.nix;
-  unstable = import inputs.nixpkgs-unstable {
-    inherit (pkgs.stdenv.hostPlatform) system;
-    config.allowUnfree = true;
-  };
-  t3code = unstable.callPackage ../../pkgs/t3code { t3codeSrc = inputs.t3code-src; };
 in
 {
   imports = (lib.optional (builtins.pathExists hardwareConfig) hardwareConfig) ++ [
@@ -29,27 +24,6 @@ in
 
   # Identity
   networking.hostName = "icebox";
-
-  # t3code desktop control surface, reachable from phones on the LAN
-  # and over the tailnet at http://icebox:3773.
-  networking.firewall.allowedTCPPorts = [ 3773 ];
-
-  systemd.services.t3code-server = {
-    description = "T3 Code server (tailnet-reachable control surface)";
-    wantedBy = [ "multi-user.target" ];
-    after = [ "network-online.target" "tailscaled.service" "sops-nix.service" ];
-    wants = [ "network-online.target" ];
-    serviceConfig = {
-      Type = "simple";
-      User = "wesbragagt";
-      ExecStart = "${pkgs.writeShellScript "t3code-server-start" ''
-        export EXA_API_KEY="$(cat /run/secrets/exa_api_key)"
-        exec ${t3code}/bin/t3 serve --host 0.0.0.0 --port 3773
-      ''}";
-      Restart = "on-failure";
-      RestartSec = 5;
-    };
-  };
 
   # Wake-on-LAN for the wired NIC. BIOS enables platform support, but Linux
   # still needs to allow the PCI device as a wake source and arm magic-packet
