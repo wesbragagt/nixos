@@ -81,7 +81,7 @@ let
     };
   };
 
-  # Generated from home/ccflare/config.yml so OMP and Claude Code share one pointer.
+  # Keep configured aliases and discover new Codex models from ccflare.
   modelsFile = yamlFormat.generate "omp-models.yml" {
     providers.ccflare = {
       inherit (config.wes.ccflare) baseUrl apiKey;
