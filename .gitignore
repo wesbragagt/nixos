@@ -4,3 +4,4 @@ reviews/
 
 config/features.yaml
 .specs/
+core.[0-9]*

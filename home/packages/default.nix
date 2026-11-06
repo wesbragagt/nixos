@@ -18,6 +18,7 @@ let
   piCodingAgentEnabled = (hostProfile.features or { }).pi-coding-agent or false;
   codexEnabled = (hostProfile.features or { }).codex or true;
   t3codeEnabled = (hostProfile.features or { }).t3code or true;
+  codex = pkgs.callPackage ../../pkgs/codex { };
   unstable = import inputs.nixpkgs-unstable {
     inherit (pkgs.stdenv.hostPlatform) system;
     config.allowUnfree = true;
@@ -268,7 +269,7 @@ in
       (pkgs.callPackage ../../pkgs/pi-coding-agent { bun-bin-1_4_2 = pkgs.callPackage ../../pkgs/bun-bin-1_4_2 { }; })
     ]
     ++ lib.optionals codexEnabled [
-      unstable.codex
+      codex
     ]
     ++ lib.optionals t3codeEnabled [
       (unstable.symlinkJoin {
@@ -283,7 +284,7 @@ in
           for program in "$out/bin"/*; do
             wrapProgram "$program" --prefix PATH : "${unstable.lib.makeBinPath [
               (pkgs.callPackage ../../pkgs/claude-code { })
-              unstable.codex
+              codex
             ]}"
           done
         '';

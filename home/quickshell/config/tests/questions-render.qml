@@ -9,6 +9,7 @@ ShellRoot {
     property string question: ""
     property string submittedQuestion: "Markdown rendering fixture"
     property string answer: ""
+    readonly property string conversation: answer
     property string error: ""
     property string outcome: ""
     property string phase: "answering"

@@ -10,6 +10,7 @@ ShellRoot {
     property string question: "Current draft"
     property string submittedQuestion: "Current question"
     property string answer: "Current streamed answer"
+    readonly property string conversation: answer
     property string error: ""
     property string outcome: ""
     property string phase: "answering"

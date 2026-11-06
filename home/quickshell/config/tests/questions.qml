@@ -95,6 +95,24 @@ ShellRoot {
         state.openUrl("https://example.com/")
         compositor.rawEvent({name: "openwindow", data: "ghi,6,chromium-browser,Example"})
         t.equal(mover.detachedCalls.length, 1, "a window already on the workspace is not moved")
+        state.clear()
+        wire.finish()
+        t.verify(state.submit("context one"), "conversation starts")
+        begin("ctx")
+        wire.chunk("ctx", "one", "a")
+        wire.reply({stopReason: "end_turn"})
+        t.equal(state.phase, "ready", "session stays open after an answer")
+        const launches = wire.launches.length
+        t.verify(state.submit("context two"), "follow-up accepted")
+        t.equal(wire.launches.length, launches, "follow-up reuses the process")
+        const follow = wire.sent[wire.sent.length - 1]
+        t.equal(follow.method + ":" + follow.params.sessionId + ":" + follow.params.prompt[0].text, "session/prompt:ctx:context two", "follow-up prompts the same session")
+        t.equal(state.answer, "", "follow-up starts with an empty answer")
+        wire.chunk("ctx", "two", "b")
+        wire.reply({stopReason: "end_turn"})
+        t.equal(state.answer, "two", "follow-up answer arrives")
+        t.equal(state.conversation, "> context one\n\none\n\n---\n\n> context two\n\ntwo", "transcript keeps earlier turns")
+        t.verify(state.phase === "ready" && !state.busy, "ready again after the follow-up")
       }
     ]
   }

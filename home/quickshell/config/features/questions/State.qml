@@ -45,7 +45,8 @@ Item {
   property string phase: "idle"
   property string toolActivity: ""
   property string sessionId: ""
-  readonly property bool busy: phase !== "idle"
+  // "ready" keeps the OMP session alive between questions so follow-ups share context.
+  readonly property bool busy: phase !== "idle" && phase !== "ready"
 
   property int turnTimeoutMs: 180000
   property int initializeTimeoutMs: 15000
@@ -72,26 +73,51 @@ Item {
     return value !== null && typeof value === "object" && !Array.isArray(value)
   }
 
-  function clear(): bool {
-    if (busy) return false
-    question = ""
-    submittedQuestion = ""
+  // Markdown transcript of every turn in this conversation, oldest first.
+  readonly property string conversation: {
+    const turns = _turns.concat(submittedQuestion || answer ? [{q: submittedQuestion, a: answer}] : [])
+    return turns.map(turn => [turn.q ? "> " + turn.q.split("\n").join("\n> ") : "", turn.a].filter(Boolean).join("\n\n")).join("\n\n---\n\n")
+  }
+  property var _turns: []
+
+  function _resetTurn() {
     answer = ""
     error = ""
     outcome = ""
     toolActivity = ""
-    sessionId = ""
     _messages = []
     _tools = []
     _currentMessage = -1
+  }
+
+  // Starts a fresh conversation. A live session is closed first.
+  function clear(): bool {
+    if (busy) return false
+    if (phase === "ready") _beginClose()
+    question = ""
+    submittedQuestion = ""
+    sessionId = ""
+    _turns = []
+    _resetTurn()
     return true
   }
 
   function submit(text): bool {
     if (busy || typeof text !== "string" || !text.trim()) return false
-    clear()
+    const followUp = phase === "ready" && sessionId !== ""
+    if (followUp && submittedQuestion) _turns = _turns.concat([{q: submittedQuestion, a: answer}])
+    if (!followUp) { sessionId = ""; _turns = [] }
+    _resetTurn()
     question = text.trim()
     submittedQuestion = question
+    if (followUp) {
+      _promptSettled = false
+      phase = "answering"
+      turnTimer.restart()
+      return _request("prompt", "session/prompt", {
+        sessionId: sessionId, prompt: [{type: "text", text: submittedQuestion}]
+      })
+    }
     _home = Quickshell.env("HOME") || ""
     if (!_home.startsWith("/")) {
       error = "HOME must be an absolute home directory to start OMP."
@@ -213,7 +239,21 @@ Item {
     phase = "idle"
   }
 
+  function _ready() {
+    turnTimer.stop()
+    operationTimer.stop()
+    graceTimer.stop()
+    toolActivity = ""
+    phase = "ready"
+  }
+
   function _exited(code, status) {
+    if (phase === "ready") {
+      // The idle session died; the next question starts a new one.
+      sessionId = ""
+      _finish()
+      return
+    }
     if (!busy) return
     if (!_closing || code !== 0 || status !== 0) {
       if (!error && outcome !== "cancelled") {
@@ -315,7 +355,8 @@ Item {
         default: _fail("Unknown OMP prompt stop reason: " + result.stopReason); return
         }
       }
-      _beginClose()
+      if (error) _beginClose()
+      else _ready()
     } else if (operation === "close") {
       _closeStdin()
     }

@@ -48,7 +48,10 @@ ShellRoot {
         wire.reply({sessionId: "close"})
         wire.chunk("close", "done", "m")
         wire.reply({stopReason: "end_turn"})
-        t.equal(wire.sent[wire.sent.length - 1].method, "session/close", "settled turn closes session before EOF")
+        t.equal(state.phase, "ready", "settled turn keeps the session open")
+        t.verify(!wire.sent.some(frame => frame.method === "session/close"), "follow-ups reuse the session")
+        t.verify(state.clear(), "new question ends the conversation")
+        t.equal(wire.sent[wire.sent.length - 1].method, "session/close", "ending a conversation closes the session before EOF")
       },
       () => {
         if (state.busy) return false

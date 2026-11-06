@@ -35,10 +35,12 @@ ShellRoot {
         t.equal(closes, 1, "Escape closes from question input")
         t.verify(state.busy, "closing keeps active question")
         wire.finish()
+        // The transcript quotes the question above the answer; this test addresses the answer alone.
+        state.submittedQuestion = ""
         state.answer = "[Qt documentation](https://doc.qt.io/)"
       },
       () => {
-        if (!widget.answerEdit.text.length) return false
+        if (widget.answerEdit.text.indexOf("Qt documentation") < 0) return false
         widget.focusInput()
         keys.keyClick(Qt.Key_Tab)
         t.verify(!widget.input.activeFocus, "Tab traverses from question input")

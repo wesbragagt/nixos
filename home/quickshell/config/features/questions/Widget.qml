@@ -19,7 +19,7 @@ Item {
   property var selectedHistory: null
   property alias historySearch: historySearchInput
   property alias historyList: historyResults
-  readonly property string displayedAnswer: historyVisible ? (selectedHistory ? selectedHistory.answer : "") : featureState.answer
+  readonly property string displayedAnswer: historyVisible ? (selectedHistory ? selectedHistory.answer : "") : featureState.conversation
   readonly property string historyMessage: history.busy ? "Loading saved conversations…"
     : history.error ? history.error
     : history.results.length ? "" : history.query.trim() ? "No matching conversations." : "No saved conversations yet."
@@ -55,6 +55,7 @@ Item {
     return featureState.outcome === "completed" ? Shared.Theme.green : Shared.Theme.yellow
   }
   property int _renderRevision: 0
+  property bool _scrollToEnd: false
   readonly property string statusText: {
     if (historyVisible) return ""
     switch (featureState.phase) {
@@ -110,7 +111,7 @@ Item {
   function submitQuestion() {
     if (questionInput.inputMethodComposing || featureState.busy) return false
     const accepted = featureState.submit(questionInput.text)
-    if (accepted) focusInput()
+    if (accepted) { _scrollToEnd = true; focusInput() }
     return accepted
   }
   function newQuestion() {
@@ -143,7 +144,8 @@ Item {
     renderTimer.stop()
     if (renderedAnswer === displayedAnswer) return
     const previousY = answerViewport.contentY
-    const follow = (!historyVisible || renderedAnswer.length > 0) && answerViewport.contentHeight - answerViewport.height - previousY <= 24
+    const follow = _scrollToEnd || ((!historyVisible || renderedAnswer.length > 0) && answerViewport.contentHeight - answerViewport.height - previousY <= 24)
+    _scrollToEnd = false
     const revision = ++_renderRevision
     renderedAnswer = displayedAnswer
     // TextEdit lays out Markdown after its text binding updates. Restore only
@@ -190,10 +192,12 @@ Item {
   Timer { id: renderTimer; interval: 50; onTriggered: root.flushAnswer() }
   Connections {
     target: root.featureState
-    function onAnswerChanged() { root.queueAnswer() }
+    function onConversationChanged() { root.queueAnswer() }
     function onPhaseChanged() {
       if (root.historyVisible) return
       if (root.featureState.phase === "starting") root.resetAnswer()
+      // A follow-up replaces the previous question: leave it selected so typing overwrites it.
+      if (root.featureState.phase === "ready") { root.focusInput(); questionInput.selectAll() }
       if (!root.featureState.busy || root.featureState.phase === "closing") root.flushAnswer()
     }
     function onQuestionChanged() {
