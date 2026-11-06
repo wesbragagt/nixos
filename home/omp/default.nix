@@ -2,7 +2,7 @@
 let
   cfg = config.wes.omp;
   ompPkg = pkgs.callPackage ../../pkgs/pi-coding-agent {
-    bun-bin-1_4_2 = pkgs.callPackage ../../pkgs/bun-bin-1_4_2 { };
+    bun-bin-1_4_4 = pkgs.callPackage ../../pkgs/bun-bin-1_4_4 { };
   };
 
   agentsLink = lib.optionalAttrs (builtins.pathExists ./config/agents) {

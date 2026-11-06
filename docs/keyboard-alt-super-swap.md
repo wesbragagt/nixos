@@ -15,6 +15,9 @@ tags:
 
 Hosts opt into or out of the swap with `hostProfile.swapAltSuper` in `flake.nix`.
 
+`iceflake` enables the swap in its `flake.nix` host profile. Do not set
+`defaultHostProfile` in a host module; it is not a NixOS option.
+
 When enabled, the generated Hyprland config contains:
 
 ```ini

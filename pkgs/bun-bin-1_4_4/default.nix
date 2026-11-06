@@ -5,7 +5,7 @@ let
     if stdenvNoCC.hostPlatform.isDarwin && stdenvNoCC.hostPlatform.isAarch64 then
       {
         name = "darwin-aarch64";
-        hash = "sha256-Izz/X4ccPjHW7sXmYK7wPMOZLXxCMxyPcruhpjiK+k0=";
+        hash = "sha256-87/El3jqhuolGOs2Mwcm2hKpgOAEI+jLs2taVYSw3nk=";
         binPath = "bun-darwin-aarch64/bun";
       }
     else if stdenvNoCC.hostPlatform.isDarwin then
@@ -17,13 +17,13 @@ let
     else
       {
         name = "linux-x64";
-        hash = "sha256-M3LpjR+IBVITGPRQozVDlbkZqETUvGugQ4DCgIif9qw=";
+        hash = "sha256-QfuQ53tZoWw2EbNX38GmIn8Rqkn4h5LVD6JmNtPnib8=";
         binPath = "bun-linux-x64/bun";
       };
 in
 stdenvNoCC.mkDerivation rec {
   pname = "bun-bin";
-  version = "1.4.2";
+  version = "1.4.4";
 
   src = fetchzip {
     url = "https://github.com/oven-sh/bun/releases/download/bun-v${version}/bun-${platform.name}.zip";

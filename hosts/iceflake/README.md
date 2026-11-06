@@ -45,6 +45,26 @@ stop and arrange the documented helper before proceeding.
 System secrets are disabled for bootstrap. Follow `secrets/README.md` to enroll
 the host before enabling `sopsHostKeyPath` in its flake profile.
 
+## Automatic disk unlock
+
+The systemd initrd attempts TPM2 unlock. Desktop login still requires a password.
+Enroll this machine once after running `git add -A && rebuild`:
+
+```bash
+sudo systemd-cryptenroll --tpm2-device=auto --tpm2-pcrs=7 /dev/disk/by-uuid/4b2d6b8c-2939-4c01-8b5c-7ff4cefcc833
+```
+
+Enter the existing disk passphrase locally. Enrollment adds a TPM keyslot without
+removing the passphrase slot. Keep that passphrase for recovery. Changing Secure
+Boot settings can require the passphrase and TPM re-enrollment.
+
+Secure Boot is currently disabled. PCR 7 binding does not authenticate the boot
+files in this state; modified boot files can obtain the disk key. Desktop login
+does not prevent that attack. This is an explicit convenience/security tradeoff.
+
+After reboot, verify the disk unlocks without a prompt and SDDM still asks for
+the login password. If TPM unlock fails, use the existing disk passphrase.
+
 ## Check graphics after reboot
 
 ```bash

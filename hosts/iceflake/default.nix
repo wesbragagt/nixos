@@ -25,6 +25,12 @@ in
   boot.kernelPackages = pkgs.linuxPackages_latest;
   boot.initrd.kernelModules = [ "amdgpu" ];
 
+  boot.initrd.systemd.enable = true;
+  boot.initrd.systemd.tpm2.enable = true;
+  boot.initrd.luks.devices."luks-4b2d6b8c-2939-4c01-8b5c-7ff4cefcc833".crypttabExtraOpts = [
+    "tpm2-device=auto"
+  ];
+
   # Match the driver rather than a PCI address or an unstable card number.
   services.udev.extraRules = ''
     SUBSYSTEM=="drm", KERNEL=="card[0-9]*", ENV{DEVTYPE}=="drm_minor", DRIVERS=="amdgpu", SYMLINK+="dri/amd-integrated"

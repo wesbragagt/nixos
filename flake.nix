@@ -224,7 +224,7 @@
             isLaptop = true;
             hasWireless = true;
             graphics = "amd";
-            swapAltSuper = false;
+            swapAltSuper = true;
             hypridle = {
               lockTimeout = 300;
               dpmsTimeout = 330;

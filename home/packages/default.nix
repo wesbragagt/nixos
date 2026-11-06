@@ -266,7 +266,7 @@ in
       ffmpeg
     ]
     ++ lib.optionals piCodingAgentEnabled [
-      (pkgs.callPackage ../../pkgs/pi-coding-agent { bun-bin-1_4_2 = pkgs.callPackage ../../pkgs/bun-bin-1_4_2 { }; })
+      (pkgs.callPackage ../../pkgs/pi-coding-agent { bun-bin-1_4_4 = pkgs.callPackage ../../pkgs/bun-bin-1_4_4 { }; })
     ]
     ++ lib.optionals codexEnabled [
       codex

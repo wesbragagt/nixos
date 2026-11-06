@@ -4,18 +4,18 @@
   fetchzip,
   runtimeShell,
   jq,
-  bun-bin-1_4_2,
+  bun-bin-1_4_4,
 }:
 buildNpmPackage (finalAttrs: {
   pname = "pi-coding-agent";
-  version = "18.12.6";
+  version = "18.17.0";
 
   src = fetchzip {
     url = "https://registry.npmjs.org/@oh-my-pi/pi-coding-agent/-/pi-coding-agent-${finalAttrs.version}.tgz";
-    hash = "sha256-bZMdYNai/C3tNcAQitgn1M/eVXo/aEJFpq8mQxXSz7U=";
+    hash = "sha256-LCacmEthnAVV7RDke+qESxp2E/vNa672RUPAXh7j+j0=";
   };
 
-  npmDepsHash = "sha256-r3dKq5Q9rudBkn+yUasJWUekl1k9JpFgudc5YDV/e88=";
+  npmDepsHash = "sha256-ymQalaSR92h5MKdMX2JOUz4A793MAokh58lvbZbJcUA=";
   forceEmptyCache = true;
 
   postPatch = ''
@@ -42,7 +42,7 @@ buildNpmPackage (finalAttrs: {
     mkdir -p $out/bin
     cat > $out/bin/omp <<EOF
 #!${runtimeShell}
-exec "${lib.getExe bun-bin-1_4_2}" "$out/lib/node_modules/@oh-my-pi/pi-coding-agent/dist/cli.js" "\$@"
+exec "${lib.getExe bun-bin-1_4_4}" "$out/lib/node_modules/@oh-my-pi/pi-coding-agent/dist/cli.js" "\$@"
 EOF
     chmod +x $out/bin/omp
     runHook postInstall

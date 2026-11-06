@@ -1,4 +1,7 @@
-setupVersion: 2
+setupVersion: 3
+symbolPreset: nerd
+theme:
+  dark: titanium
 defaultThinkingLevel: low
 modelRoles:
   default: ccflare/gpt-6-luna:medium
