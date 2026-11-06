@@ -21,7 +21,7 @@ let
   // (hostProfile.hypridle or { });
   monitorConfig =
     if isLaptop then
-      "eDP-1,preferred,auto,1"
+      "eDP-1,preferred,auto,auto"
     else
       ",preferred,auto,1";
   kbOptionsLine = lib.optionalString swapAltSuper "      kb_options = altwin:swap_lalt_lwin\n";
