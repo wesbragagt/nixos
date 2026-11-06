@@ -218,6 +218,23 @@
           };
         };
 
+        iceflake = mkHost {
+          name = "iceflake";
+          hostProfile = {
+            isLaptop = true;
+            hasWireless = true;
+            graphics = "amd";
+            swapAltSuper = false;
+            hypridle = {
+              lockTimeout = 300;
+              dpmsTimeout = 330;
+              suspendTimeout = 1800;
+            };
+            # Bootstrap without secrets until this host is enrolled in SOPS.
+            sopsHostKeyPath = null;
+          };
+        };
+
         icebox = mkHost {
           name = "icebox";
           hostProfile = {
