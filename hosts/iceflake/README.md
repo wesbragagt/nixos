@@ -5,6 +5,13 @@ render offloading. No PRIME bus IDs or global NVIDIA offload variables are set.
 The shared graphics module enables both 64-bit and 32-bit graphics support.
 The desktop uses this repository's Hyprland configuration.
 
+AMD is loaded in the initrd for early display initialization. A driver-based udev
+rule creates `/dev/dri/amd-integrated`, independent of PCI addresses and DRM card
+numbering. Hyprland uses only this device through `AQ_DRM_DEVICES`. The SDDM login
+screen uses KWin with `KWIN_DRM_DEVICES` set to the same AMD device.
+Displays wired directly to the NVIDIA GPU are excluded from these compositors;
+use the laptop's internal screen for the initial boot test.
+
 ## Bootstrap on the Framework
 
 From the repository root on the installed Framework NixOS system:
@@ -42,6 +49,7 @@ the host before enabling `sopsHostKeyPath` in its flake profile.
 
 ```bash
 lspci -nnk | rg -A3 'VGA|3D|Display'
+ls -l /dev/dri/amd-integrated
 glxinfo -B
 vulkaninfo --summary
 nvidia-smi
