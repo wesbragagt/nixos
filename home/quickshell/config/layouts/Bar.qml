@@ -43,6 +43,7 @@ PanelWindow {
     spacing: 20
     Launcher.Widget { featureState: bar.launcherState }
     Metrics.Widget { featureState: bar.metricsState }
+    Battery.Widget { featureState: bar.batteryState }
   }
 
   Row {
@@ -67,7 +68,6 @@ PanelWindow {
       popupHostWindow: bar
     }
     Bluetooth.Widget { featureState: bar.bluetoothState }
-    Battery.Widget { featureState: bar.batteryState }
     Clock.Widget { featureState: bar.clockState }
     Lock.Widget { featureState: bar.lockState }
   }

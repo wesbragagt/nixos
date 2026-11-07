@@ -35,7 +35,7 @@ Operational checklist for this repo.
 - `hosts/<host>/default.nix` — host-specific settings
 - `home/wesbragagt.nix` — HM entrypoint
 - `home/hyprland/` — Hyprland Home Manager wiring; `default.nix` generates `hyprland.conf`, and `hyprlock.conf` is store-managed from the repo file
-- `home/waybar/` — Waybar Home Manager wiring; `default.nix` generates the Waybar config and CSS
+- `home/quickshell/` — Quickshell Home Manager wiring and live-editable QML bar configuration
 - `home/neovim/` — Neovim Home Manager wiring + config + `lsp-registry.json`
 - `home/tmux/` — tmux Home Manager wiring + `tmux.conf`
 - `home/programs.nix` — user program module imports
@@ -59,7 +59,7 @@ Operational checklist for this repo.
   - launcher/theme/editor/user-session wiring
 - Organize by **feature/domain**, not by file type, once a feature has more than one file.
   - Good: `home/hyprland/default.nix` + nearby supporting files like `hyprlock.conf`
-  - Good: `home/waybar/default.nix` generating the runtime config/CSS from Nix
+  - Good: `home/quickshell/default.nix` + nearby `config/` QML files
 - Use `default.nix` as the feature entrypoint when a module owns multiple related files.
 - Keep top-level entrypoints thin:
   - `common.nix` imports system modules
@@ -120,7 +120,7 @@ schedules remove <name>
 ## Desktop iteration shortcuts
 
 - Reload Hyprland: `hyprctl reload`
-- Restart Waybar: `systemctl --user restart waybar` (systemd respawns it, so `hyprctl dispatch exec` adds a duplicate)
+- Restart Quickshell: `systemctl --user restart quickshell` (QML edits normally hot reload)
 - Restart dock: `pkill nwg-dock && hyprctl dispatch exec "nwg-dock-hyprland ..."`
 - Cursor changes: `hyprctl setcursor <theme> <size>`
 

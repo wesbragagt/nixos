@@ -9,7 +9,7 @@ Item {
   property string status: ""
   property int remainingMinutes: -1
   readonly property string remainingTime: remainingMinutes < 0 ? "" : remainingMinutes >= 60 ? Math.floor(remainingMinutes / 60) + "h " + (remainingMinutes % 60) + "m" : remainingMinutes + "m"
-  readonly property string tooltipText: status + (remainingTime ? "\nAbout " + remainingTime + " remaining" : "")
+  readonly property string tooltipText: status + (remainingTime ? "\nAbout " + remainingTime + (charging ? " until full" : " remaining") : "")
   readonly property bool available: capacity >= 0
   readonly property bool charging: status === "Charging"
 
@@ -30,10 +30,14 @@ Item {
       }
       const energy = reading("ENERGY_NOW")
       const power = reading("POWER_NOW")
+      const energyFull = reading("ENERGY_FULL")
       const charge = reading("CHARGE_NOW")
       const current = reading("CURRENT_NOW")
-      const hours = power > 0 && Number.isFinite(energy) ? energy / power : current > 0 && Number.isFinite(charge) ? charge / current : NaN
-      state.remainingMinutes = state.available && state.status === "Discharging" && Number.isFinite(hours) ? Math.round(hours * 60) : -1
+      const chargeFull = reading("CHARGE_FULL")
+      const energyLeft = state.charging ? energyFull - energy : energy
+      const chargeLeft = state.charging ? chargeFull - charge : charge
+      const hours = power > 0 && energyLeft >= 0 ? energyLeft / power : current > 0 && chargeLeft >= 0 ? chargeLeft / current : NaN
+      state.remainingMinutes = state.available && (state.charging || state.status === "Discharging") && Number.isFinite(hours) ? Math.round(hours * 60) : -1
     }
   }
   Timer { interval: 30000; running: state.pollingEnabled; repeat: true; onTriggered: state.refresh() }

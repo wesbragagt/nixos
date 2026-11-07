@@ -74,6 +74,18 @@ git add -A   # flake reads from the git tree; untracked files are invisible
 rebuild
 ```
 
+### System generation retention
+
+`common.nix` keeps at most 7 NixOS system generations after each weekly
+`nix-gc.service` run. It deletes the oldest non-current generations first,
+including newer generations when needed after a rollback. The current generation
+is always preserved. The systemd-boot menu also shows at most 7 generations.
+
+Garbage collection then removes unreferenced store paths. User and Home Manager
+profile generations are not pruned. More than 7 system generations can accumulate
+between weekly runs. Apply the policy with `rebuild`; `rebuild build` only builds
+it and does not delete existing generations.
+
 ## Framework 16 battery policy
 
 `hosts/iceflake/default.nix` enables TLP to switch power settings automatically.
@@ -89,9 +101,11 @@ Check the active policy with `sudo tlp-stat -s -p` and warnings with
 
 ## Quickshell bar
 
-Home Manager installs Quickshell and starts `quickshell.service` with the Hyprland session instead of Waybar. `~/.config/quickshell` uses `mkOutOfStoreSymlink` to point at `home/quickshell/config` in the working tree. Root `shell.qml` owns one shared State per feature outside `Variants` and creates `layouts/Bar.qml` per physical screen. The layout handles only window geometry, placement, dependency forwarding, and local popup focus; monitor removal/recreation does not reset shared data or duplicate collectors.
+Home Manager installs Quickshell and starts `quickshell.service` with the Hyprland session. `~/.config/quickshell` uses `mkOutOfStoreSymlink` to point at `home/quickshell/config` in the working tree. Root `shell.qml` owns one shared State per feature outside `Variants` and creates `layouts/Bar.qml` per physical screen. The layout handles only window geometry, placement, dependency forwarding, and local popup focus; monitor removal/recreation does not reset shared data or duplicate collectors.
 
-The bar includes launcher, workspaces, CPU/memory/disk usage, audio controls, idle control, host-enabled transcription, Wi-Fi settings, Bluetooth status, clock, and session locking. Idle control shares `idle-control` with Super+Shift+I. The design does not include Waybar's media, laptop battery, notification, or system tray widgets.
+The bar includes launcher, workspaces, CPU/memory/disk usage, audio controls, idle control, host-enabled transcription, Wi-Fi settings, Bluetooth status, battery, clock, and session locking. Idle control shares `idle-control` with Super+Shift+I. Hover over the battery for approximate time remaining while discharging or time until full while charging. Estimates refresh every 30 seconds and require a nonzero power/current reading. The design does not include media, notification, or system tray widgets.
+
+The battery badge sits immediately after disk usage on the left side of the bar.
 
 Edit feature presentation and interactions in `features/<feature>/Widget.qml` and data/actions in `State.qml` (network uses `NetworkWidget.qml`, `NetworkState.qml`, and feature-local `NetworkPanel.qml`). Data flows Layout <- Widget <- State <- Process; actions go through State. Network connection/scan data is shared, while popup visibility, selection, password, reveal, and focus are local to each monitor. Credentials use stdin only and clear on send/close/cancel. `shared/Theme.qml` owns colors/fonts; `shared/Badge.qml`, `Label.qml`, and `CommandRunner.qml` supply reusable visuals and independent command runners.
 

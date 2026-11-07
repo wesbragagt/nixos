@@ -106,8 +106,26 @@ in
   nix.gc = {
     automatic = true;
     dates = "weekly";
-    options = "--delete-older-than 7d";
+    options = "";
   };
+  boot.loader.systemd-boot.configurationLimit = 7;
+  systemd.services.nix-gc.preStart = ''
+    generations="$(${config.nix.package}/bin/nix-env --profile /nix/var/nix/profiles/system --list-generations)"
+    obsolete=()
+    count=0
+    while read -r generation details; do
+      [[ -n "$generation" ]] || continue
+      count=$((count + 1))
+      if [[ "$details" != *"(current)"* ]]; then
+        obsolete+=("$generation")
+      fi
+    done <<< "$generations"
+
+    if (( count > 7 )); then
+      ${config.nix.package}/bin/nix-env --profile /nix/var/nix/profiles/system \
+        --delete-generations "''${obsolete[@]:0:$((count - 7))}"
+    fi
+  '';
   nix.optimise.automatic = true;
   nixpkgs.config.allowUnfree = true;
   nixpkgs.overlays = [

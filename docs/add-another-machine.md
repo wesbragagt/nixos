@@ -122,7 +122,7 @@ nixosConfigurations = {
 
 The profile controls shared laptop/desktop behavior:
 
-- `isLaptop = true` enables the Waybar battery module, `battery-estimate`, brightness keys, and the laptop monitor settings in the generated Hyprland config. The internal `eDP-1` panel uses its preferred resolution and automatic scaling based on pixel density; desktop monitors retain scale `1`.
+- `isLaptop = true` enables brightness keys and the laptop monitor settings in the generated Hyprland config. The internal `eDP-1` panel uses its preferred resolution and automatic scaling based on pixel density; desktop monitors retain scale `1`. Quickshell detects the battery automatically.
 - `hasWireless = true` installs Wi-Fi tray/UI helpers and adds `nm-applet` autostart to the generated Hyprland config.
 - `graphics = "intel"` enables Intel VA-API packages and `LIBVA_DRIVER_NAME=iHD`; leave desktops as `"generic"` unless you know they need Intel-specific acceleration.
 - `sopsHostKeyPath = null` disables system secret declarations for bootstrap installs. Set it to `"/etc/ssh/ssh_host_ed25519_key"` after the host recipient has been added and secrets have been re-wrapped.

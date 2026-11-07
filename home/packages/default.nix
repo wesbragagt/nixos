@@ -8,7 +8,6 @@
 }:
 let
   isLinux = lib.hasSuffix "-linux" hostSystem;
-  isLaptop = hostProfile.isLaptop or false;
   hasWireless = hostProfile.hasWireless or false;
   # Desktop/Wayland tooling only makes sense on a Linux host with a display.
   isHeadless = (hostProfile.headless or false) || !isLinux;
@@ -249,9 +248,6 @@ in
       # network / Wi-Fi tray helpers
       networkmanagerapplet
       iwgtk
-    ]
-    ++ lib.optionals (isLinux && isLaptop) [
-      (pkgs.writeShellScriptBin "battery-estimate" (builtins.readFile ../../scripts/battery-estimate.sh))
     ]
     ++ lib.optionals (gamingEnabled && !isHeadless) [
       # gaming (feature-flagged; enable via /etc/nixos/features.yaml)
