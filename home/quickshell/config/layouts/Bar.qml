@@ -11,6 +11,7 @@ import "../features/transcription" as Transcription
 import "../features/dictation" as Dictation
 import "../features/network" as Network
 import "../features/bluetooth" as Bluetooth
+import "../features/battery" as Battery
 import "../features/clock" as Clock
 import "../features/lock" as Lock
 
@@ -26,6 +27,7 @@ PanelWindow {
   required property var dictationState
   required property var networkState
   required property var bluetoothState
+  required property var batteryState
   required property var clockState
   required property var lockState
 
@@ -65,6 +67,7 @@ PanelWindow {
       popupHostWindow: bar
     }
     Bluetooth.Widget { featureState: bar.bluetoothState }
+    Battery.Widget { featureState: bar.batteryState }
     Clock.Widget { featureState: bar.clockState }
     Lock.Widget { featureState: bar.lockState }
   }

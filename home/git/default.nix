@@ -19,6 +19,12 @@ in
 
   programs.git = {
     enable = true;
+    includes = [
+      {
+        condition = "gitdir:~/dev/work/";
+        path = "~/dev/work/.gitconfig";
+      }
+    ];
     settings = {
       user = {
         name = "wesbragagt";
@@ -29,7 +35,6 @@ in
       gpg.ssh.program = "${gitSshSign}/bin/git-ssh-sign";
       commit.gpgsign = true;
       tag.gpgsign = true;
-      init.defaultBranch = "main";
       # configure to use --rebase by default
       pull.rebase = true;
       alias = lib.optionalAttrs hunkEnabled {

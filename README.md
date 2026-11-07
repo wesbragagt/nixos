@@ -74,6 +74,19 @@ git add -A   # flake reads from the git tree; untracked files are invisible
 rebuild
 ```
 
+## Framework 16 battery policy
+
+`hosts/iceflake/default.nix` enables TLP to switch power settings automatically.
+On battery, it selects the firmware's `low-power` profile, CPU `balance_power`
+preference, and disables CPU boost. On AC, it restores the `balanced` profile,
+`balance_performance` preference, and allows boost. TLP also manages device power
+saving, including Wi-Fi. Power Profiles Daemon stays disabled to avoid conflicts.
+
+Screen brightness, refresh rate, and suspend behavior remain unchanged. Disabling
+boost reduces CPU performance on battery. No battery charge limit is configured.
+Check the active policy with `sudo tlp-stat -s -p` and warnings with
+`sudo tlp-stat -w`. Apply changes with `git add -A && rebuild`.
+
 ## Quickshell bar
 
 Home Manager installs Quickshell and starts `quickshell.service` with the Hyprland session instead of Waybar. `~/.config/quickshell` uses `mkOutOfStoreSymlink` to point at `home/quickshell/config` in the working tree. Root `shell.qml` owns one shared State per feature outside `Variants` and creates `layouts/Bar.qml` per physical screen. The layout handles only window geometry, placement, dependency forwarding, and local popup focus; monitor removal/recreation does not reset shared data or duplicate collectors.
@@ -128,6 +141,24 @@ CLI/dotfile parts of `home/` work on Ubuntu/Arch/etc. The desktop configuration 
 ```bash
 nix run home-manager/master -- switch --flake github:wesbragagt/nixos-config#wesbragagt
 ```
+
+## Work Git identity
+
+Repositories under `~/dev/work/` include `~/dev/work/.gitconfig` after the personal
+defaults. Create that machine-local file with your work identity and SSH signing
+public key path:
+
+```ini
+[user]
+    name = Your Work Name
+    email = you@company.com
+    signingKey = ~/.ssh/work_signing_key.pub
+```
+
+The matching private key stays in the Bitwarden SSH agent. Other repositories
+keep the personal identity and signing key. After applying the Home Manager
+configuration, check inside a work repository with
+`git config --show-origin --get-regexp '^user\.'`.
 
 ## Per-host SSH
 

@@ -10,6 +10,7 @@ import "features/transcription" as Transcription
 import "features/dictation" as Dictation
 import "features/network" as Network
 import "features/bluetooth" as Bluetooth
+import "features/battery" as Battery
 import "features/clock" as Clock
 import "features/lock" as Lock
 import "features/questions" as Questions
@@ -25,6 +26,7 @@ ShellRoot {
   Dictation.State { id: dictation }
   Network.NetworkState { id: network }
   Bluetooth.State { id: bluetooth }
+  Battery.State { id: battery }
   Clock.State { id: clock }
   Lock.State { id: lock }
   Questions.State { id: questions }
@@ -46,6 +48,7 @@ ShellRoot {
       dictationState: dictation
       networkState: network
       bluetoothState: bluetooth
+      batteryState: battery
       clockState: clock
       lockState: lock
     }
