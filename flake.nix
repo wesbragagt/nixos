@@ -110,7 +110,7 @@
         hasWireless = false;
         headless = false;
         graphics = "generic";
-        swapAltSuper = true;
+        swapAltSuperKeyboards = [ ];
         hypridle = {
           lockTimeout = 300;
           dpmsTimeout = 330;
@@ -208,6 +208,8 @@
             hasWireless = true;
             graphics = "intel";
             hypridle = {
+            # Built-in "AT Translated Set 2" keyboard.
+            swapAltSuperKeyboards = [ "0001:0001" ];
               lockTimeout = 300;
               dpmsTimeout = 330;
               suspendTimeout = 1800;
@@ -224,7 +226,8 @@
             isLaptop = true;
             hasWireless = true;
             graphics = "amd";
-            swapAltSuper = true;
+            # Framework Laptop 16 ANSI keyboard module only; external keyboards keep native Alt/Super.
+            swapAltSuperKeyboards = [ "32ac:0012" ];
             hypridle = {
               lockTimeout = 300;
               dpmsTimeout = 330;
@@ -241,7 +244,6 @@
             isLaptop = false;
             hasWireless = false;
             graphics = "amd";
-            swapAltSuper = false;
             hypridle = {
               lockTimeout = 900;
               dpmsTimeout = 1200;

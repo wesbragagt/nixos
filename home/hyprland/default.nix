@@ -11,7 +11,6 @@ let
   transcribeEnabled = hostProfile.features.transcribe or false;
   dictateEnabled = hostProfile.features.dictate or false;
   hasWireless = hostProfile.hasWireless or false;
-  swapAltSuper = hostProfile.swapAltSuper or true;
   hypridle = {
     lockTimeout = 300;
     dpmsTimeout = 330;
@@ -24,7 +23,6 @@ let
       "eDP-1,preferred,auto,auto"
     else
       ",preferred,auto,1";
-  kbOptionsLine = lib.optionalString swapAltSuper "      kb_options = altwin:swap_lalt_lwin\n";
   wirelessAutostartLine = lib.optionalString hasWireless "    exec-once = nm-applet --indicator\n";
   hyprlandConfigText = ''
     exec-once = dbus-update-activation-environment --systemd DISPLAY HYPRLAND_INSTANCE_SIGNATURE WAYLAND_DISPLAY XDG_CURRENT_DESKTOP && systemctl --user stop hyprland-session.target && systemctl --user start hyprland-session.target
@@ -96,7 +94,7 @@ let
       float_switch_override_focus = 0
       mouse_refocus = 0
       kb_layout = us
-${kbOptionsLine}      repeat_delay = 250
+      repeat_delay = 250
       repeat_rate = 40
     }
 
@@ -118,6 +116,8 @@ ${kbOptionsLine}      repeat_delay = 250
     bind = $mod, L, movefocus, r
     bind = $mod, K, movefocus, u
     bind = $mod, J, movefocus, d
+    bindm = $mod, mouse:272, movewindow
+    bindm = $mod, mouse:273, resizewindow
     bind = $mod, 1, workspace, 1
     bind = $mod, 2, workspace, 2
     bind = $mod, 3, workspace, 3
@@ -144,6 +144,8 @@ ${kbOptionsLine}      repeat_delay = 250
     ${lib.optionalString transcribeEnabled "bind = $mod SHIFT, U, exec, transcribe toggle"}
     ${lib.optionalString dictateEnabled "bind = $mod, D, exec, dictate start"}
     ${lib.optionalString dictateEnabled "bindr = $mod, D, exec, dictate stop"}
+    ${lib.optionalString isLaptop "bindl = , switch:on:Lid Switch, exec, ${kanshictl} switch docked-lg-lid-closed"}
+    ${lib.optionalString isLaptop "bindl = , switch:off:Lid Switch, exec, ${kanshictl} switch docked-lg"}
     bind = $mod SHIFT, l, exec, kill -35 $(pgrep -fo nwg-dock)
 
     bindel = , XF86AudioRaiseVolume, exec, wpctl set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ 5%+
@@ -268,6 +270,8 @@ ${wirelessAutostartLine}    exec-once = nwg-dock-hyprland -p bottom -lp end -i 3
       "${suspendIfNoSsh}/bin/suspend-if-no-ssh"
     else
       "systemctl suspend";
+  restartBar = "${pkgs.systemd}/bin/systemctl --user restart quickshell.service";
+  kanshictl = "${config.services.kanshi.package}/bin/kanshictl";
 in
 {
   home.packages = with pkgs; [
@@ -303,6 +307,61 @@ in
         }
       ];
     };
+  };
+
+  # Docked layouts change on hotplug; match the LG by description because dock port names (DP-13) shift.
+  # Hyprland leaves layer surfaces at the old monitor position after kanshi moves an output, so the bar restarts.
+  services.kanshi = lib.mkIf isLaptop {
+    enable = true;
+    systemdTarget = "hyprland-session.target";
+    settings = [
+      {
+        profile.name = "laptop";
+        profile.outputs = [
+          {
+            criteria = "eDP-1";
+            status = "enable";
+            position = "0,0";
+          }
+        ];
+        profile.exec = [ restartBar ];
+      }
+      {
+        profile.name = "docked-lg";
+        profile.outputs = [
+          {
+            criteria = "LG Electronics LG ULTRAGEAR 411MXXQ3K634";
+            mode = "2560x1440@164.96Hz";
+            scale = 1.0;
+            position = "0,0";
+          }
+          {
+            # Assumes iceflake's 1600-wide logical panel (Hyprland auto scale 1.6), centered under the LG.
+            criteria = "eDP-1";
+            status = "enable";
+            position = "480,1440";
+          }
+        ];
+        profile.exec = [ restartBar ];
+      }
+      {
+        # Listed after docked-lg so hotplug picks the open-lid layout; only the lid binds select it.
+        profile.name = "docked-lg-lid-closed";
+        profile.outputs = [
+          {
+            criteria = "LG Electronics LG ULTRAGEAR 411MXXQ3K634";
+            mode = "2560x1440@164.96Hz";
+            scale = 1.0;
+            position = "0,0";
+          }
+          {
+            criteria = "eDP-1";
+            status = "disable";
+          }
+        ];
+        profile.exec = [ restartBar ];
+      }
+    ];
   };
 
   systemd.user.services.hyprlock = {

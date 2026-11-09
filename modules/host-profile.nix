@@ -31,10 +31,11 @@
       description = "Host graphics profile used for hardware acceleration packages and environment defaults.";
     };
 
-    swapAltSuper = lib.mkOption {
-      type = lib.types.bool;
-      default = true;
-      description = "Whether Hyprland should swap left Alt and left Super for this host.";
+    swapAltSuperKeyboards = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [ ];
+      example = [ "32ac:0012" ];
+      description = "keyd vendor:product IDs of keyboards that swap left Alt and left Super; other keyboards keep native keys.";
     };
 
     hypridle = {
