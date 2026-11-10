@@ -14,6 +14,7 @@ import "../features/bluetooth" as Bluetooth
 import "../features/battery" as Battery
 import "../features/clock" as Clock
 import "../features/lock" as Lock
+import "../features/vanta" as Vanta
 
 PanelWindow {
   id: bar
@@ -30,6 +31,7 @@ PanelWindow {
   required property var batteryState
   required property var clockState
   required property var lockState
+  required property var vantaState
 
   WlrLayershell.keyboardFocus: (networkWidget.focusRequired || dictationWidget.focusRequired) ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
   anchors { top: true; left: true; right: true }
@@ -68,6 +70,7 @@ PanelWindow {
       popupHostWindow: bar
     }
     Bluetooth.Widget { featureState: bar.bluetoothState }
+    Vanta.Widget { featureState: bar.vantaState }
     Clock.Widget { featureState: bar.clockState }
     Lock.Widget { featureState: bar.lockState }
   }

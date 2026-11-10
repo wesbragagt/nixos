@@ -89,6 +89,7 @@
         ffmpeg = false;
         transcribe = false;
         dictate = false;
+        vanta = false;
         # Coding agents ship on every host; set "<name>: false" in
         # /etc/nixos/features.yaml to opt a host out.
         # Off by default: the upstream npm postinstall downloads from
@@ -207,9 +208,9 @@
             isLaptop = true;
             hasWireless = true;
             graphics = "intel";
-            hypridle = {
             # Built-in "AT Translated Set 2" keyboard.
             swapAltSuperKeyboards = [ "0001:0001" ];
+            hypridle = {
               lockTimeout = 300;
               dpmsTimeout = 330;
               suspendTimeout = 1800;

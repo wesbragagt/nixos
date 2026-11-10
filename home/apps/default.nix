@@ -12,6 +12,8 @@ let
 in
 {
   programs.foot.enable = true;
+  programs.kitty.enable = true;
+  programs.wezterm.enable = true;
 
   programs.obsidian = {
     enable = true;

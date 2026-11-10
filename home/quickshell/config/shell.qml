@@ -14,6 +14,7 @@ import "features/battery" as Battery
 import "features/clock" as Clock
 import "features/lock" as Lock
 import "features/questions" as Questions
+import "features/vanta" as Vanta
 
 ShellRoot {
   Launcher.State { id: launcher }
@@ -30,6 +31,7 @@ ShellRoot {
   Clock.State { id: clock }
   Lock.State { id: lock }
   Questions.State { id: questions }
+  Vanta.State { id: vanta }
   Layouts.Questions { featureState: questions }
 
   Variants {
@@ -51,6 +53,7 @@ ShellRoot {
       batteryState: battery
       clockState: clock
       lockState: lock
+      vantaState: vanta
     }
   }
 }
