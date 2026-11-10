@@ -86,6 +86,53 @@ profile generations are not pruned. More than 7 system generations can accumulat
 between weekly runs. Apply the policy with `rebuild`; `rebuild build` only builds
 it and does not delete existing generations.
 
+### Chromium profiles
+
+`chromium-profile <profile>` reads `~/.config/chromium-profiles/config.yaml`
+at launch. It uses a separate data directory for each profile and applies
+defaults before Chromium starts. Edit the file to add profiles without rebuilding:
+The file is local to the user and is not managed by Nix or stored in this repo.
+
+```yaml
+defaults:
+  vertical_tabs: true
+profiles:
+  personal:
+    name: Personal
+    color: "#ff0000"
+```
+
+The default data directory is `~/.config/chromium-profiles/<profile>` and the
+default profile directory is `Default`. Quote colors as `#RRGGBB`. Changes
+apply when the data directory is not already open in Chromium. Chromium's
+internal profile preferences can change between versions.
+Profile launches suppress Chromium's default-browser prompt.
+
+## Zen agent control
+
+`home/zen/browserctl.nix` packages a pinned Browserctl revision and registers its
+Native Messaging host with Zen. The Zen package loads the extension at startup
+through AutoConfig, without a remote-debugging port. Browserctl uses Bun from
+the pinned unstable input because screenshot conversion requires `Bun.Image`.
+
+Apply with `git add -A && rebuild`, then fully quit and reopen Zen. Open the
+Zen Native Agent extension popup and enable **Allow agent access**. Check with
+`browserctl status`. Find a specific tab with
+`browserctl tabs.find example.com --loaded`, then use `browserctl shot <tab-id>`
+or `browserctl call page.snapshot '{"tabId":123,"maxTextChars":2000}'`.
+Run `browserctl --help` for input, upload, and tab commands.
+
+The access toggle defaults off for a fresh profile and remembers your choice.
+Disable it after use. While enabled, any process running as your user can
+control accessible tabs, including authenticated pages. The extension uses
+synthetic input, so some sites reject actions. Browser permission dialogs and
+CAPTCHA still require you. AutoConfig runs privileged startup code with its
+sandbox disabled; the loader and extension are pinned in the Nix store.
+
+The upstream `browserctl preflight` command assumes an `/opt` installation and
+does not detect this Nix-managed loader. Use `browserctl status` after restarting
+Zen instead. Do not run upstream's `sudo make install-autoload` on NixOS.
+
 ## Tmux scrolling
 
 `home/tmux/tmux.conf` routes the mouse wheel to full-screen and mouse-aware apps.

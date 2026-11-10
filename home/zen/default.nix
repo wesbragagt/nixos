@@ -3,6 +3,8 @@ let
   bookmarks = import ./bookmarks.nix;
 in
 {
+  imports = [ ./browserctl.nix ];
+
   programs.zen-browser = {
     enable = true;
     profiles.default = {

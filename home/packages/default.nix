@@ -210,7 +210,6 @@ in
       bitwarden-desktop
 
       # desktop / ui
-      chromium
       gtk3
       nwg-dock-hyprland
       rofi-calc

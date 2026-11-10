@@ -32,6 +32,7 @@ let
       inputs.qmd.homeModules.default
     ]
     ++ lib.optionals (!isHeadless) [
+      ./chromium
       ./hyprland
       ./quickshell
       ./wallpaper
