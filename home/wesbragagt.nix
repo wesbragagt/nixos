@@ -15,10 +15,9 @@ let
   features = hostProfile.features or { };
   claudeCodeEnabled = features.claude-code or false;
   ompEnabled = features.omp or false;
-  mnemosyneEnabled = features.mnemosyne or false;
   transcribeEnabled = features.transcribe or false;
   dictateEnabled = features.dictate or false;
-  hunkEnabled = hostProfile.hunkEnabled or true;
+  syngoEnabled = features.syngo or false;
   base = {
     imports = [
       ./repo-root.nix
@@ -32,7 +31,6 @@ let
       inputs.sops-nix.homeManagerModules.sops
       inputs.qmd.homeModules.default
     ]
-    ++ lib.optionals hunkEnabled [ inputs.hunk.homeManagerModules.default ]
     ++ lib.optionals (!isHeadless) [
       ./hyprland
       ./quickshell
@@ -42,7 +40,8 @@ let
       inputs.zen-browser.homeModules.beta
     ]
     ++ lib.optionals (!isHeadless && transcribeEnabled) [ ./transcribe ]
-    ++ lib.optionals (!isHeadless && dictateEnabled) [ ./dictate ];
+    ++ lib.optionals (!isHeadless && dictateEnabled) [ ./dictate ]
+    ++ lib.optionals (isLinux && syngoEnabled) [ ./syngo ];
 
     home.username = "wesbragagt";
     home.homeDirectory = homeDirectory;
@@ -58,10 +57,6 @@ let
 
     wes.omp.enable = ompEnabled;
     home.packages = [ pkgs.nssTools ];
-    home.sessionVariables = lib.optionalAttrs mnemosyneEnabled {
-      MNEMOSYNE_DATA_DIR = "${homeDirectory}/.local/share/mnemosyne";
-      MNEMOSYNE_BANK = "default";
-    };
 
   }
   // lib.optionalAttrs isLinux {

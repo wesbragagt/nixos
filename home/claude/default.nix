@@ -4,11 +4,9 @@
   config,
   repoRoot,
   inputs,
-  hostProfile ? { },
   ...
 }:
 let
-  hunkEnabled = hostProfile.hunkEnabled or true;
   cfg = config.wes.claudeCode;
   unstable = import inputs.nixpkgs-unstable {
     inherit (pkgs.stdenv) system;
@@ -67,9 +65,6 @@ in
       ".claude/CLAUDE.md".source =
         config.lib.file.mkOutOfStoreSymlink "${repoRoot}/home/agents/AGENTS.md";
       ".claude/agents".source = config.lib.file.mkOutOfStoreSymlink "${cfg.configRoot}/agents";
-    }
-    // lib.optionalAttrs hunkEnabled {
-      ".claude/skills/hunk".source = inputs.hunk + "/skills/hunk-review";
     }
     // repoSkillLinks;
 

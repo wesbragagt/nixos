@@ -12,7 +12,7 @@ Example:
 features:
   claude-code: true
   omp: true
-  mnemosyne: true
+  syngo: true
 ```
 
 Feature names are parsed from lines with this form:
@@ -28,7 +28,7 @@ Set a feature to `false`, or remove the line, to disable it.
 - `claude-code` enables the Claude Code Home Manager module.
 - `omp` enables the Open Model Platform (OMP) Home Manager module.
 - `gaming` installs Lutris on desktop hosts (skipped on headless hosts).
-- `mnemosyne` installs the Mnemosyne memory CLI and its default shared-bank environment.
+- `syngo` installs Syngo from GitHub on Linux, initializes a device identity, registers `~/p2p` as folder `p2p`, and starts a systemd user service bound to `tailscale0`.
 
 The default for all listed features is disabled.
 Host-specific profile settings still control hardware, desktop, and secret behavior.
@@ -39,6 +39,21 @@ Apply changes with:
 rebuild build
 rebuild
 ```
+
+### Syngo peer setup
+
+The `syngo` input uses the public GitHub repository `github:wesbragagt/syngo`.
+Fetching it does not require an SSH key or tailnet access.
+Update the pinned revision with `nix flake update syngo`, then run `git add -A && rebuild`.
+
+The service creates `~/p2p` without replacing existing files. Identity and configuration stay in `~/.local/share/syngo`.
+It registers folder `p2p` only when that ID and path are not already registered. A conflicting ID or path stops setup rather than replacing configuration.
+TCP port 22001 binds only to the Tailscale address, leaving port 22000 available for existing Syngo instances. No peer receives access automatically.
+
+Follow [Pair Syngo devices](syngo-pairing.md) to exchange identities, pair both devices, grant access to `p2p`, and verify file transfers.
+
+Hunk, Mnemosyne, and qBittorrent are no longer managed by this configuration. Existing application data is preserved.
+
 
 ## better-ccflare
 

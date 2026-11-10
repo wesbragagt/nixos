@@ -1,11 +1,8 @@
 {
-  lib,
   pkgs,
-  hostProfile ? { },
   ...
 }:
 let
-  hunkEnabled = hostProfile.hunkEnabled or true;
   gitSshSign = pkgs.writeShellScriptBin "git-ssh-sign" ''
     export SSH_AUTH_SOCK="''${SSH_AUTH_SOCK:-$HOME/.bitwarden-ssh-agent.sock}"
     exec ${pkgs.openssh}/bin/ssh-keygen "$@"
@@ -37,16 +34,6 @@ in
       tag.gpgsign = true;
       # configure to use --rebase by default
       pull.rebase = true;
-      alias = lib.optionalAttrs hunkEnabled {
-        hdiff = "!hunk diff";
-        hdiffs = "!hunk diff --staged";
-        hshow = "!hunk show";
-      };
-    }
-    // lib.optionalAttrs hunkEnabled {
-      diff.tool = "hunk";
-      difftool.prompt = false;
-      "difftool \"hunk\"".cmd = "hunk difftool \"$LOCAL\" \"$REMOTE\" \"$MERGED\"";
     };
   };
 
@@ -67,17 +54,4 @@ in
     ];
   };
 
-  programs.hunk = lib.mkIf hunkEnabled {
-    enable = true;
-    enableGitIntegration = false;
-    settings = {
-      theme = "tokyo-night";
-      mode = "stack";
-      line_numbers = true;
-      wrap_lines = true;
-      hunk_headers = true;
-      color_moved = true;
-      transparent_background = false;
-    };
-  };
 }

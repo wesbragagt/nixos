@@ -12,7 +12,6 @@ let
   # Desktop/Wayland tooling only makes sense on a Linux host with a display.
   isHeadless = (hostProfile.headless or false) || !isLinux;
   gamingEnabled = (hostProfile.features or { }).gaming or false;
-  mnemosyneEnabled = (hostProfile.features or { }).mnemosyne or false;
   ffmpegEnabled = (hostProfile.features or { }).ffmpeg or false;
   piCodingAgentEnabled = (hostProfile.features or { }).pi-coding-agent or false;
   codexEnabled = (hostProfile.features or { }).codex or true;
@@ -254,9 +253,6 @@ in
       lutris
       wineWowPackages.stable
       winetricks
-    ]
-    ++ lib.optionals mnemosyneEnabled [
-      (pkgs.callPackage ../../pkgs/mnemosyne { })
     ]
     ++ lib.optionals ffmpegEnabled [
       ffmpeg

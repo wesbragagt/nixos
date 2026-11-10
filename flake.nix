@@ -31,10 +31,6 @@
       url = "github:wesbragagt/iceman";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
-    hunk = {
-      url = "github:modem-dev/hunk";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     qmd = {
       url = "github:tobi/qmd";
       inputs.nixpkgs.follows = "nixpkgs-unstable";
@@ -43,6 +39,10 @@
       # Change this pointer to build a personal fork.
       url = "github:pingdotgg/t3code/v0.1.3";
       flake = false;
+    };
+    syngo = {
+      url = "github:wesbragagt/syngo";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
     chromium-webapps = {
       url = "github:chobbledotcom/nix-chromium-webapps";
@@ -84,11 +84,10 @@
         claude-code = false;
         omp = false;
         gaming = false;
-        qbittorrent = false;
-        mnemosyne = false;
         ffmpeg = false;
         transcribe = false;
         dictate = false;
+        syngo = false;
         # Coding agents ship on every host; set "<name>: false" in
         # /etc/nixos/features.yaml to opt a host out.
         # Off by default: the upstream npm postinstall downloads from
@@ -131,7 +130,6 @@
             "name"
             "useHomeSopsSecrets"
             "features"
-            "hunkEnabled"
           ];
           home-manager.useGlobalPkgs = true;
           home-manager.useUserPackages = true;
@@ -215,8 +213,6 @@
               suspendTimeout = 1800;
             };
             sopsHostKeyPath = "/etc/ssh/ssh_host_ed25519_key";
-            # bun (via hunkdiff) needs AVX2; this host's Celeron N4120 lacks it.
-            hunkEnabled = false;
           };
         };
 
