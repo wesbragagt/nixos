@@ -86,6 +86,28 @@ profile generations are not pruned. More than 7 system generations can accumulat
 between weekly runs. Apply the policy with `rebuild`; `rebuild build` only builds
 it and does not delete existing generations.
 
+## Tmux scrolling
+
+`home/tmux/tmux.conf` routes the mouse wheel to full-screen and mouse-aware apps.
+Over shell output, wheel-up enters tmux copy mode. Subsequent wheel events move
+two lines at a time. Scrolling back to the bottom exits wheel-entered copy mode
+unless a selection or another copy-mode command has disabled automatic exit.
+
+Press `Ctrl-Space`, then `[` to inspect tmux history explicitly, including while
+an app owns the wheel. Press `q` to leave copy mode; `Escape` only clears the
+selection. Apply with `git add -A && rebuild`, then press `Ctrl-Space`, then `r`
+to reload an existing tmux server.
+
+Kitty is installed alongside Foot for image-rendering trials. Launch `kitty`
+or select Kitty in the app launcher. Foot remains the default launcher terminal.
+Run `omp` directly in Kitty first to compare image scrolling without tmux.
+Tmux enables `allow-passthrough` so OMP can send Kitty graphics to the terminal.
+After enabling it in an existing server, restart OMP because it caches terminal
+capabilities. If detection still fails in Kitty, try
+`PI_FORCE_IMAGE_PROTOCOL=kitty omp`; do not force Kitty graphics in Foot.
+WezTerm is also installed for comparison. Launch `wezterm start`, then run `omp`
+outside tmux first before comparing the same conversation inside tmux.
+
 ## Framework 16 battery policy
 
 `hosts/iceflake/default.nix` enables TLP to switch power settings automatically.
@@ -134,6 +156,60 @@ Click the microphone badge beside speaker volume to enable suppression, use raw 
 `home/mic-noise/` owns the independent user service and persistent virtual source. FFmpeg processes audio locally with `arnndn`; the three presets blend 50%, 75%, or 100% processed audio. Bypass sends raw microphone audio, not silence or mute. Toggle/preset/source changes restart the FFmpeg stream with a brief interruption while the virtual microphone remains present. Source removal or processor failure produces an error and requires manual restart; there is no automatic retry loop. Do not select a desktop monitor as the physical default source.
 
 On first startup the service downloads the pinned `bd.rnnn` model from [arnndn-models](https://github.com/richardpl/arnndn-models) over HTTPS and verifies SHA-256. It caches the model under `$XDG_CACHE_HOME/mic-noise` and saves settings under `$XDG_STATE_HOME/mic-noise`, defaulting to `~/.cache` and `~/.local/state`. Cached verified weights work offline. The weights are not bundled in the repository or Nix closure. Upstream has no explicit model redistribution license; runtime downloading does not resolve that ambiguity. Audio is streamed only, never saved or uploaded by this feature. Suppression quality and latency depend on the microphone and model; Soundveil-equivalent performance is not claimed.
+
+## Vanta device compliance agent
+
+On x86_64 NixOS, set `vanta: true` under `features:` in
+`/etc/nixos/features.yaml` with exactly two spaces of indentation:
+
+```yaml
+features:
+  vanta: true
+```
+
+The flag defaults to false. `modules/vanta.nix` installs the pinned vendor
+agent, enables `nix-ld` for its downloaded executables, and starts the root
+`vanta.service`. Vanta can update its executables in `/var/vanta`; the pinned
+package seeds a fresh installation and replaces them when that package changes.
+Systemd tmpfiles creates `/var/vanta` owned by root with mode `0700` before
+the service starts.
+Vanta officially supports Debian/Ubuntu, not NixOS. Confirm that your
+organization accepts the device checks Vanta reports on NixOS.
+
+Create `/etc/vanta.conf` as root with mode `0600`, then edit it with
+`sudoedit /etc/vanta.conf`. Use the key, owner email, and region from your
+organization's Vanta enrollment instructions:
+
+```json
+{
+  "AGENT_KEY": "<organization enrollment key>",
+  "OWNER_EMAIL": "<work email>",
+  "REGION": "<us, eu, or aus>",
+  "NEEDS_OWNER": true,
+  "ACTIVATION_REQUESTED_NONCE": 1
+}
+```
+
+Set `ACTIVATION_REQUESTED_NONCE` to the current Unix timestamp in milliseconds
+(`date +%s000`). Keep this mutable file outside Git and the Nix store; the agent
+stores enrollment state there. Do not use `environment.etc.*.text` for the key.
+Run `git add -A && rebuild` after enabling the flag. Without `/etc/vanta.conf`,
+systemd skips the service. If you create the file after switching, run
+`sudo systemctl start vanta`.
+
+Check `systemctl status vanta`, `sudo vanta-cli status`, and
+`sudo vanta-cli check-registration`. Logs are in `journalctl -u vanta`.
+Set `vanta: false` and rebuild to stop and remove the service; this keeps
+`/etc/vanta.conf` and `/var/vanta` for reenrollment or manual removal.
+
+The Quickshell top bar shows a shield with green `Vanta on` while
+`vanta.service` is active and running, or yellow `Vanta off` otherwise.
+It polls systemd every two seconds without sudo and hides when the service
+is not installed. Click the badge to stop or start the service using the host's
+passwordless sudo access; it shows `Vanta …` while the action runs. Hover for
+the systemd state or an action error. Stopping pauses monitoring but does not
+disable startup at boot. This indicator does not check enrollment or compliance
+results.
 
 ## npm global packages
 

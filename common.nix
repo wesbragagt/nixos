@@ -46,6 +46,7 @@ in
     ./modules/responsiveness.nix
     ./modules/cron.nix
   ]
+  ++ lib.optionals ((hostProfile.features or { }).vanta or false) [ ./modules/vanta.nix ]
   ++ lib.optionals (!isHeadless) [
     ./modules/graphics.nix
     ./modules/audio.nix
