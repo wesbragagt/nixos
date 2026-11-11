@@ -108,31 +108,6 @@ apply when the data directory is not already open in Chromium. Chromium's
 internal profile preferences can change between versions.
 Profile launches suppress Chromium's default-browser prompt.
 
-## Zen agent control
-
-`home/zen/browserctl.nix` packages a pinned Browserctl revision and registers its
-Native Messaging host with Zen. The Zen package loads the extension at startup
-through AutoConfig, without a remote-debugging port. Browserctl uses Bun from
-the pinned unstable input because screenshot conversion requires `Bun.Image`.
-
-Apply with `git add -A && rebuild`, then fully quit and reopen Zen. Open the
-Zen Native Agent extension popup and enable **Allow agent access**. Check with
-`browserctl status`. Find a specific tab with
-`browserctl tabs.find example.com --loaded`, then use `browserctl shot <tab-id>`
-or `browserctl call page.snapshot '{"tabId":123,"maxTextChars":2000}'`.
-Run `browserctl --help` for input, upload, and tab commands.
-
-The access toggle defaults off for a fresh profile and remembers your choice.
-Disable it after use. While enabled, any process running as your user can
-control accessible tabs, including authenticated pages. The extension uses
-synthetic input, so some sites reject actions. Browser permission dialogs and
-CAPTCHA still require you. AutoConfig runs privileged startup code with its
-sandbox disabled; the loader and extension are pinned in the Nix store.
-
-The upstream `browserctl preflight` command assumes an `/opt` installation and
-does not detect this Nix-managed loader. Use `browserctl status` after restarting
-Zen instead. Do not run upstream's `sudo make install-autoload` on NixOS.
-
 ## Tmux scrolling
 
 `home/tmux/tmux.conf` routes the mouse wheel to full-screen and mouse-aware apps.
@@ -147,8 +122,15 @@ to reload an existing tmux server.
 
 Kitty is installed alongside Foot and uses Maple Mono NL NF at size 14, a
 Tokyo Night palette, 90% background opacity, 8-point padding, and a bar cursor.
+Kitty closes without confirmation, including when child processes are running.
+Home Manager generates `~/.config/kitty/kitty.conf` from `home/apps/kitty.conf`.
+Edit that file and run `rebuild`; Home Manager sends Kitty `SIGUSR1` when the
+generated config changes, reloading supported settings in running windows.
 Launch `kitty`, select Kitty in the app launcher, or press `Super+T`.
 Foot remains available and is the terminal used by rofi.
+`common.nix` installs `kitty.terminfo` system-wide so login shells can resolve
+`TERM=xterm-kitty` before Home Manager session initialization. Apply with
+`rebuild`, then open a new shell; do not change Kitty's `TERM` to hide lookup errors.
 Tmux enables `allow-passthrough` so OMP can send Kitty graphics to the terminal.
 After enabling it in an existing server, restart OMP because it caches terminal
 capabilities. If detection still fails in Kitty, try

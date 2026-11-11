@@ -151,6 +151,7 @@ in
     curl
     git
     cacert
+    kitty.terminfo
     rebuild
   ];
 
