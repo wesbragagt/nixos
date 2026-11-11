@@ -145,15 +145,14 @@ an app owns the wheel. Press `q` to leave copy mode; `Escape` only clears the
 selection. Apply with `git add -A && rebuild`, then press `Ctrl-Space`, then `r`
 to reload an existing tmux server.
 
-Kitty is installed alongside Foot for image-rendering trials. Launch `kitty`
-or select Kitty in the app launcher. Foot remains the default launcher terminal.
-Run `omp` directly in Kitty first to compare image scrolling without tmux.
+Kitty is installed alongside Foot and uses Maple Mono NL NF at size 14, a
+Tokyo Night palette, 90% background opacity, 8-point padding, and a bar cursor.
+Launch `kitty`, select Kitty in the app launcher, or press `Super+T`.
+Foot remains available and is the terminal used by rofi.
 Tmux enables `allow-passthrough` so OMP can send Kitty graphics to the terminal.
 After enabling it in an existing server, restart OMP because it caches terminal
 capabilities. If detection still fails in Kitty, try
 `PI_FORCE_IMAGE_PROTOCOL=kitty omp`; do not force Kitty graphics in Foot.
-WezTerm is also installed for comparison. Launch `wezterm start`, then run `omp`
-outside tmux first before comparing the same conversation inside tmux.
 
 ## Framework 16 battery policy
 

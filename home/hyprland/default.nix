@@ -30,7 +30,7 @@ let
     $browser = zen-beta
     $menu = rofi-freq
     $mod = SUPER
-    $term = foot
+    $term = kitty
 
     animations {
       bezier = subtle, 0.16, 1, 0.3, 1
