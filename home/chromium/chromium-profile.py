@@ -21,14 +21,22 @@ def write_json(path, data):
 
 def main():
     parser = argparse.ArgumentParser(description='Launch a configured Chromium profile')
-    parser.add_argument('profile', help=f'Profile name from {CONFIG}')
+    parser.add_argument('--list', action='store_true', help='List configured profiles for the app launcher')
+    parser.add_argument('profile', nargs='?', help=f'Profile name from {CONFIG}')
     parser.add_argument('arguments', nargs=argparse.REMAINDER, help='Arguments passed to Chromium')
     args = parser.parse_args()
-    if args.profile in ('.', '..') or '/' in args.profile:
-        parser.error('profile must be a single directory name')
     config = yaml.safe_load(CONFIG.read_text()) if CONFIG.exists() else {}
     config = config or {}
     profiles = config.get('profiles', {})
+    if args.list:
+        for key, settings in profiles.items():
+            name = (settings or {}).get('name', key)
+            print(f'{key}\t{name}')
+        return
+    if not args.profile:
+        parser.error('profile is required')
+    if args.profile in ('.', '..') or '/' in args.profile:
+        parser.error('profile must be a single directory name')
     if args.profile not in profiles:
         parser.error(f'profile {args.profile!r} is not configured in {CONFIG}')
     settings = DEFAULTS | (config.get('defaults') or {}) | (profiles[args.profile] or {})
@@ -37,7 +45,7 @@ def main():
     profile_dir = settings.get('profile_directory', 'Default')
     if profile_dir in ('', '.', '..') or '/' in profile_dir:
         parser.error('profile_directory must be a single directory name')
-    command = [os.environ['CHROMIUM_PROFILE_BROWSER'], f'--user-data-dir={directory}', f'--profile-directory={profile_dir}', '--remote-debugging-port=0', '--no-default-browser-check', *args.arguments]
+    command = [os.environ['CHROMIUM_PROFILE_BROWSER'], f'--user-data-dir={directory}', f'--profile-directory={profile_dir}', '--no-default-browser-check', *args.arguments]
     with (directory / '.chromium-profile.lock').open('w') as lock:
         try:
             fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)

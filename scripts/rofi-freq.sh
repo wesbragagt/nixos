@@ -25,7 +25,7 @@ mapfile -t files < <(
 
 # One awk pass over all files: emit "id\tname\ticon" for visible Applications.
 # Then merge with cache counts and sort.
-choice=$(awk -F= '
+choice=$({ awk -F= '
   FNR==1 { in_de=0; type=""; name=""; icon=""; nodisp=0; hidden=0;
            split(FILENAME, a, "/"); id=a[length(a)] }
   /^\[Desktop Entry\][[:space:]]*$/ { in_de=1; next }
@@ -47,7 +47,9 @@ choice=$(awk -F= '
       print id "\t" name "\t" (icon==""?"applications-other":icon)
     }
   }
-' "${files[@]}" | awk -F'\t' -v cache="$CACHE" -v ESC=$'\x1f' '
+' "${files[@]}"
+  chromium-profile --list | awk -F'\t' '{ gsub(/[\t\r\n]/, " ", $2); print "chromium-profile:" $1 "\tChromium - " $2 "\tchromium" }'
+} | awk -F'\t' -v cache="$CACHE" -v ESC=$'\x1f' '
   BEGIN {
     while ((getline line < cache) > 0) {
       n = split(line, p, "\t")
@@ -72,5 +74,9 @@ awk -F'\t' -v id="$sel_id" '
   END { if (!bumped) print "1\t" id }
 ' "$CACHE" > "$CACHE.tmp" && mv "$CACHE.tmp" "$CACHE"
 
-gtk-launch "${sel_id%.desktop}" >/dev/null 2>&1 &
+if [[ "$sel_id" == chromium-profile:* ]]; then
+  chromium-profile "${sel_id#chromium-profile:}" >/dev/null 2>&1 &
+else
+  gtk-launch "${sel_id%.desktop}" >/dev/null 2>&1 &
+fi
 disown

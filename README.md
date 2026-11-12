@@ -107,6 +107,8 @@ default profile directory is `Default`. Quote colors as `#RRGGBB`. Changes
 apply when the data directory is not already open in Chromium. Chromium's
 internal profile preferences can change between versions.
 Profile launches suppress Chromium's default-browser prompt.
+The app launcher lists each configured profile as `Chromium - <name>` and reads
+the profile configuration each time it opens.
 
 ## Tmux scrolling
 
@@ -154,6 +156,10 @@ Check the active policy with `sudo tlp-stat -s -p` and warnings with
 Home Manager installs Quickshell and starts `quickshell.service` with the Hyprland session. `~/.config/quickshell` uses `mkOutOfStoreSymlink` to point at `home/quickshell/config` in the working tree. Root `shell.qml` owns one shared State per feature outside `Variants` and creates `layouts/Bar.qml` per physical screen. The layout handles only window geometry, placement, dependency forwarding, and local popup focus; monitor removal/recreation does not reset shared data or duplicate collectors.
 
 The bar includes launcher, workspaces, CPU/memory/disk usage, audio controls, idle control, host-enabled transcription, Wi-Fi settings, Bluetooth status, battery, clock, and session locking. Idle control shares `idle-control` with Super+Shift+I. Hover over the battery for approximate time remaining while discharging or time until full while charging. Estimates refresh every 30 seconds and require a nonzero power/current reading. The design does not include media, notification, or system tray widgets.
+
+The clock displays the abbreviated date and 12-hour time, such as `Nov 12 · 11:23am`.
+
+When the bar contents exceed the screen width, scroll over the bar or swipe horizontally to reach the remaining controls. Workspace buttons stay separate from the status controls.
 
 The battery badge sits immediately after disk usage on the left side of the bar.
 
@@ -230,13 +236,12 @@ Check `systemctl status vanta`, `sudo vanta-cli status`, and
 Set `vanta: false` and rebuild to stop and remove the service; this keeps
 `/etc/vanta.conf` and `/var/vanta` for reenrollment or manual removal.
 
-The Quickshell top bar shows a shield with green `Vanta on` while
-`vanta.service` is active and running, or yellow `Vanta off` otherwise.
-It polls systemd every two seconds without sudo and hides when the service
-is not installed. Click the badge to stop or start the service using the host's
-passwordless sudo access; it shows `Vanta …` while the action runs. Hover for
-the systemd state or an action error. Stopping pauses monitoring but does not
-disable startup at boot. This indicator does not check enrollment or compliance
+The Quickshell top bar shows a green shield while `vanta.service` is active and
+running, or a yellow shield otherwise. It polls systemd every two seconds without
+sudo and hides when the service is not installed. Click the shield to stop or
+start the service using the host's passwordless sudo access. Hover for the
+service state, action progress, or an action error. Stopping pauses monitoring
+but does not disable startup at boot. This indicator does not check enrollment or compliance
 results.
 
 ## npm global packages

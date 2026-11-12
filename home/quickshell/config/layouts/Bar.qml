@@ -38,7 +38,28 @@ PanelWindow {
   implicitHeight: 32
   color: "transparent"
 
+  Flickable {
+    id: viewport
+    anchors.fill: parent
+    clip: true
+    contentWidth: Math.max(width, leftSection.width + workspaceSection.width + rightSection.width + 68)
+    contentHeight: height
+    boundsBehavior: Flickable.StopAtBounds
+    flickableDirection: Flickable.HorizontalFlick
+
+    WheelHandler {
+      onWheel: event => {
+        viewport.contentX = Math.max(0, Math.min(viewport.contentWidth - viewport.width,
+          viewport.contentX - (event.angleDelta.x || event.angleDelta.y)))
+        event.accepted = true
+      }
+    }
+
+    Item {
+      width: viewport.contentWidth
+      height: viewport.height
   Row {
+    id: leftSection
     anchors.left: parent.left
     anchors.leftMargin: 14
     anchors.verticalCenter: parent.verticalCenter
@@ -49,12 +70,15 @@ PanelWindow {
   }
 
   Row {
-    anchors.centerIn: parent
-    spacing: 0
+    id: workspaceSection
+    x: Math.max(leftSection.x + leftSection.width + 20,
+      Math.min((parent.width - width) / 2, rightSection.x - width - 20))
+    anchors.verticalCenter: parent.verticalCenter
     Workspaces.Widget { featureState: bar.workspacesState }
   }
 
   Row {
+    id: rightSection
     anchors.right: parent.right
     anchors.rightMargin: 14
     anchors.verticalCenter: parent.verticalCenter
@@ -73,5 +97,7 @@ PanelWindow {
     Vanta.Widget { featureState: bar.vantaState }
     Clock.Widget { featureState: bar.clockState }
     Lock.Widget { featureState: bar.lockState }
+  }
+    }
   }
 }
