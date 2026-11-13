@@ -126,7 +126,7 @@ The profile controls shared laptop/desktop behavior:
 - `hasWireless = true` installs Wi-Fi tray/UI helpers and adds `nm-applet` autostart to the generated Hyprland config.
 - `graphics = "intel"` enables Intel VA-API packages and `LIBVA_DRIVER_NAME=iHD`; leave desktops as `"generic"` unless you know they need Intel-specific acceleration.
 - `sopsHostKeyPath = null` disables system secret declarations for bootstrap installs. Set it to `"/etc/ssh/ssh_host_ed25519_key"` after the host recipient has been added and secrets have been re-wrapped.
-- `hypridle.lockTimeout`, `hypridle.dpmsTimeout`, and `hypridle.suspendTimeout` tune per-host idle behavior. Use `suspendTimeout = null` for desktops that should not auto-suspend. Set `hypridle.suspendRequiresNoSsh = true` to skip idle suspend while a remote SSH session is active.
+- `hypridle.lockTimeout`, `hypridle.dpmsTimeout`, and `hypridle.suspendTimeout` tune per-host idle behavior. The default lock timeout is one hour. Use `suspendTimeout = null` for desktops that should not auto-suspend. Set `hypridle.suspendRequiresNoSsh = true` to skip idle suspend while a remote SSH session is active.
 
 ## 6. Add this machine as a SOPS recipient
 

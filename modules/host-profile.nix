@@ -41,7 +41,7 @@
     hypridle = {
       lockTimeout = lib.mkOption {
         type = lib.types.ints.positive;
-        default = 300;
+        default = 3600;
         description = "Seconds of inactivity before locking the session.";
       };
 

@@ -12,7 +12,7 @@ let
   dictateEnabled = hostProfile.features.dictate or false;
   hasWireless = hostProfile.hasWireless or false;
   hypridle = {
-    lockTimeout = 300;
+    lockTimeout = 3600;
     dpmsTimeout = 330;
     suspendTimeout = null;
     suspendRequiresNoSsh = false;

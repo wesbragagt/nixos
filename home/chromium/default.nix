@@ -18,4 +18,18 @@ in
       exec ${python}/bin/python ${./chromium-profile.py} "$@"
     '')
   ];
+
+  xdg.dataFile."applications/chromium-focused.desktop".text = ''
+    [Desktop Entry]
+    Type=Application
+    Name=Chromium (last focused profile)
+    Exec=${pkgs.writeShellScript "chromium-open-focused" ''
+      export HYPRCTL=${pkgs.hyprland}/bin/hyprctl
+      export CHROMIUM=${chromium}/bin/chromium
+      exec ${pkgs.python3}/bin/python ${./open-focused.py} "$@"
+    ''} %U
+    Icon=chromium
+    Terminal=false
+    MimeType=text/html;application/xhtml+xml;x-scheme-handler/http;x-scheme-handler/https;x-scheme-handler/about;x-scheme-handler/unknown;
+  '';
 }
