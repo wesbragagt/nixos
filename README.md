@@ -109,7 +109,6 @@ internal profile preferences can change between versions.
 Profile launches suppress Chromium's default-browser prompt.
 The app launcher lists each configured profile as `Chromium - <name>` and reads
 the profile configuration each time it opens.
-
 ## Tmux scrolling
 
 `home/tmux/tmux.conf` routes the mouse wheel to full-screen and mouse-aware apps.
@@ -137,6 +136,8 @@ Tmux enables `allow-passthrough` so OMP can send Kitty graphics to the terminal.
 After enabling it in an existing server, restart OMP because it caches terminal
 capabilities. If detection still fails in Kitty, try
 `PI_FORCE_IMAGE_PROTOCOL=kitty omp`; do not force Kitty graphics in Foot.
+WezTerm is also installed for comparison. Launch `wezterm start`, then run `omp`
+outside tmux first before comparing the same conversation inside tmux.
 
 ## Framework 16 battery policy
 

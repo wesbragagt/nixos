@@ -16,6 +16,7 @@ in
     enable = true;
     extraConfig = builtins.readFile ./kitty.conf;
   };
+  programs.wezterm.enable = true;
 
   programs.obsidian = {
     enable = true;

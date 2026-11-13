@@ -129,10 +129,22 @@ let
             commandLineArgs = "--remote-debugging-port=${toString port}";
           };
           launcher = pkgs.writeShellScriptBin "${name}-webapp" ''
+            config_dir="$HOME/.config/chromium-webapps"
+            config_file="$config_dir/config.yaml"
+            mkdir -p "$config_dir"
+            if [ ! -e "$config_file" ]; then
+              printf 'profiles: {}\n' > "$config_file"
+            fi
+            profile_dir="$(${pkgs.yq-go}/bin/yq -r '.profiles."${name}"."user-data-dir" // ""' "$config_file" 2>/dev/null || true)"
+            if [ -z "$profile_dir" ]; then
+              profile_dir="$config_dir/${name}"
+            elif [ "''${profile_dir#/}" = "$profile_dir" ]; then
+              profile_dir="$HOME/$profile_dir"
+            fi
             exec ${chromium}/bin/chromium \
               --window-name="${name}" \
               --app=${url} \
-              --user-data-dir="$HOME/.config/chromium-webapps/${name}" \
+              --user-data-dir="$profile_dir" \
               --no-default-browser-check \
               --disable-features=GlobalShortcutsPortal
           '';
