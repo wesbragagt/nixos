@@ -138,6 +138,10 @@ in
     })
   ];
 
+  environment.etc."chromium/policies/managed/memory-saver.json".text = builtins.toJSON {
+    HighEfficiencyModeEnabled = true;
+    MemorySaverModeSavings = 1;
+  };
   environment.etc."chromium/policies/managed/roam-media-capture.json".text = builtins.toJSON {
     AudioCaptureAllowedUrls = [ "https://ro.am/*" ];
     VideoCaptureAllowedUrls = [ "https://ro.am/*" ];
