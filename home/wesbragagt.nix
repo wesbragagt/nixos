@@ -23,6 +23,7 @@ let
       ./repo-root.nix
       ./ccflare
       ./claude
+      ./codex
       ./omp
       ./programs.nix
       ./tmux
@@ -49,6 +50,7 @@ let
     home.stateVersion = "25.11";
 
     programs.home-manager.enable = true;
+    programs.qmd.enable = true;
     wes.claudeCode = {
       enable = claudeCodeEnabled;
       aliases = {
