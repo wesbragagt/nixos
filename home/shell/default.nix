@@ -20,6 +20,8 @@ let
     if name == null || name == "standalone" then null else name;
   commonAliases = {
     vi = "nvim";
+    # Claude Code has no --no-mcp flag; strict mode with no --mcp-config loads zero MCP servers
+    claude = "claude --strict-mcp-config";
     sf = "file-fzf";
     sg = "grep-fzf";
     mk = "markdown-fzf";
@@ -125,6 +127,7 @@ in
   };
 
   home.sessionVariables = {
+    W_NOTES = "${config.home.homeDirectory}/p2p/notes-live-sync";
     EDITOR = "nvim";
     VISUAL = "nvim";
     MANPAGER = "nvim +Man!";

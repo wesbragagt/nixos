@@ -21,6 +21,8 @@ in
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
   boot.kernelPackages = pkgs.linuxPackages_latest;
+  # Run aarch64 builds (e.g. arm64 container images) under QEMU.
+  boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
 
   # Identity
   networking.hostName = "icebox";
