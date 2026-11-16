@@ -23,6 +23,8 @@ in
   boot.kernelPackages = pkgs.linuxPackages_latest;
   # Run aarch64 builds (e.g. arm64 container images) under QEMU.
   boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
+  # Static QEMU with the fix-binary flag lets Docker run arm64 containers.
+  boot.binfmt.preferStaticEmulators = true;
 
   # Identity
   networking.hostName = "icebox";
