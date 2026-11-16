@@ -40,7 +40,7 @@ def main():
     if args.profile not in profiles:
         parser.error(f'profile {args.profile!r} is not configured in {CONFIG}')
     settings = DEFAULTS | (config.get('defaults') or {}) | (profiles[args.profile] or {})
-    directory = Path(os.path.expandvars(os.path.expanduser(settings.get('data_dir', f'~/.config/chromium-profiles/{args.profile}')))).absolute()
+    directory = Path(os.path.expandvars(os.path.expanduser(settings.get('data_dir', settings.get('user-data-dir', f'~/.config/chromium-profiles/{args.profile}'))))).absolute()
     directory.mkdir(parents=True, exist_ok=True)
     profile_dir = settings.get('profile_directory', 'Default')
     if profile_dir in ('', '.', '..') or '/' in profile_dir:

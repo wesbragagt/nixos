@@ -138,6 +138,9 @@ in
     })
   ];
 
+  environment.etc."chromium/policies/managed/ai-mode.json".text = builtins.toJSON {
+    AIModeSettings = 1;
+  };
   environment.etc."chromium/policies/managed/memory-saver.json".text = builtins.toJSON {
     HighEfficiencyModeEnabled = true;
     MemorySaverModeSavings = 1;

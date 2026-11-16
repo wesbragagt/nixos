@@ -100,6 +100,12 @@ profiles:
   personal:
     name: Personal
     color: "#ff0000"
+apps:
+  linear:
+    name: Linear
+    url: https://linear.app
+    profile: personal
+    icon: https://linear.app/static/favicon.svg
 ```
 
 The default data directory is `~/.config/chromium-profiles/<profile>` and the
@@ -109,6 +115,18 @@ internal profile preferences can change between versions.
 Profile launches suppress Chromium's default-browser prompt.
 The app launcher lists each configured profile as `Chromium - <name>` and reads
 the profile configuration each time it opens.
+
+Web apps use the same local configuration. Each `apps` entry references a key
+under `profiles`; apps sharing a profile share cookies and sign-in state.
+Run `rebuild` to regenerate launcher entries during Home Manager activation,
+or `chromium-webapps sync` to apply app edits without rebuilding. Removing an
+app removes its generated launcher, not its browser data. A missing config
+creates no apps. Icons may be theme names, absolute paths, or public image URLs.
+Downloaded icons are cached locally; the first sync needs network access.
+Profile `data_dir` selects an existing browser data directory; `user-data-dir`
+is also accepted for existing configurations. Neither local app definitions
+nor downloaded icons enter the Nix store.
+
 ## Tmux scrolling
 
 `home/tmux/tmux.conf` routes the mouse wheel to full-screen and mouse-aware apps.

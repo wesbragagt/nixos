@@ -1,4 +1,4 @@
-{ pkgs, inputs, ... }:
+{ pkgs, inputs, lib, ... }:
 let
   unstable = import inputs.nixpkgs-unstable {
     inherit (pkgs.stdenv.hostPlatform) system;
@@ -9,15 +9,26 @@ let
     commandLineArgs = "--remote-debugging-port=9222";
   };
   python = pkgs.python3.withPackages (p: [ p.pyyaml ]);
+  webapps = pkgs.writeShellScriptBin "chromium-webapps" ''
+    export WEBAPP_PROFILE=${profileLauncher}/bin/chromium-profile
+    export WEBAPP_MANAGER="$0"
+    exec ${python}/bin/python ${./webapps.py} "$@"
+  '';
+  profileLauncher = pkgs.writeShellScriptBin "chromium-profile" ''
+    export CHROMIUM_PROFILE_BROWSER=${chromium}/bin/chromium
+    exec ${python}/bin/python ${./chromium-profile.py} "$@"
+  '';
 in
 {
   home.packages = [
     chromium
-    (pkgs.writeShellScriptBin "chromium-profile" ''
-      export CHROMIUM_PROFILE_BROWSER=${chromium}/bin/chromium
-      exec ${python}/bin/python ${./chromium-profile.py} "$@"
-    '')
+    webapps
+    profileLauncher
   ];
+
+  home.activation.chromiumWebApps = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    run ${webapps}/bin/chromium-webapps sync
+  '';
 
   xdg.dataFile."applications/chromium-focused.desktop".text = ''
     [Desktop Entry]
