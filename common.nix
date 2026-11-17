@@ -180,6 +180,29 @@ in
       zstd
       openssl
       libffi
+      # Chromium runtime deps for `t3 browser setup` (downloaded browsers).
+      glib
+      nss
+      nspr
+      dbus
+      atk
+      at-spi2-atk
+      at-spi2-core
+      cups
+      libdrm
+      expat
+      libgbm
+      libxkbcommon
+      pango
+      cairo
+      alsa-lib
+      xorg.libX11
+      xorg.libXcomposite
+      xorg.libXdamage
+      xorg.libXext
+      xorg.libXfixes
+      xorg.libXrandr
+      xorg.libxcb
     ];
   };
 
