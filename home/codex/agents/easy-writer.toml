@@ -1,0 +1,2 @@
+model = "gpt-6.1-luna"
+developer_instructions = "Implement the supplied easy task with minimal changes. Read the relevant code and follow its style.\nPreserve caller behavior and run the task's acceptance checks. Report changed files, verification and blockers.\n"

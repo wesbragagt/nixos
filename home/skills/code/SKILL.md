@@ -73,8 +73,10 @@ Execute tasks from a tasks.yaml file by orchestrating code-writer agents. Automa
    - Scan codebase for relevant existing patterns
 
    c. **Choose agent type**:
-   - Single file, simple change → `code-writer-simple`
-   - Multi-file, architectural, or complex → `code-writer-complex`
+   Use the task complexity label, or classify with `dx-router` when absent.
+   - `easy` → `easy-writer`
+   - `moderate` → `moderate-writer`
+   - `hard` → `hard-writer`
 
    d. **Invoke the implementation agent** using the prompter skill with this structure:
 

@@ -30,7 +30,7 @@ State the resolved output path to the user before writing files.
 
 Write:
 
-- `spec.md`: source of truth for scope, behavior, and decisions.
+- `spec.md`: agreed high-level specification, at most 500 words total.
 - `tasks.yaml`: ordered implementation tasks.
 - `<task-key>.md`: a standalone implementation packet for each task.
 
@@ -52,26 +52,21 @@ Resolve it from user input or repository evidence. Ask the user only when eviden
 
 ### 3. Write `spec.md`
 
-Use the following structure. Keep each requirement atomic and assign a stable identifier such as `FR-01`, `NFR-01`, or `AC-01`.
+Write a high-level record of the agreed specification in **500 words or fewer total**. Count the entire file, including headings, tables, links and code blocks, using whitespace-separated words. The limit applies after every revision.
 
-1. **Problem and outcome**: user problem, affected users, and intended result.
-2. **Scope**: included behavior and explicit non-goals.
-3. **Definitions and actors**: terms, roles, states, and data concepts that have more than one possible meaning.
-4. **Current facts**: repository or research facts with source paths or URLs. Mark unverified statements as assumptions.
-5. **Requirements**: functional and non-functional requirements. State observable behavior, trigger, expected result, errors, and constraints.
-6. **Behavior flows**: normal flow, failure flow, boundary cases, and state transitions.
-7. **Compatibility and migration**: existing behavior, consumers, data, configuration, and removal requirements.
-8. **Decisions and open questions**: decision, rationale, source, owner, and status. An open question must name the blocked requirement.
-9. **Acceptance criteria**: observable pass/fail statements. Map every criterion to one or more requirement identifiers.
-10. **Traceability matrix**: map each requirement to acceptance criteria and task keys.
+Use only the sections needed to cover these points:
 
-Specification rules:
+- Problem, intended outcome and affected users.
+- Agreed scope and observable requirements.
+- Decisions, essential constraints and compatibility expectations.
+- Concise acceptance criteria describing the intended outcome.
+- Any unresolved questions, named owners and affected scope. Distinguish assumptions and proposals from agreed decisions.
 
-- State what must happen and why. Put implementation choices only where they constrain compatibility, safety, or required integration.
-- Use testable language. Avoid vague words such as "fast", "easy", "robust", and "appropriate" without a measurable condition.
-- Define default behavior, invalid input behavior, empty states, authorization, concurrency, retries, and rollback when they apply.
-- Do not invent requirements. Keep assumptions visible until resolved.
-- Keep decisions in this file. Do not depend on the chat transcript for decisions or constraints.
+State what must happen and why. Keep requirements testable and preserve every material agreement. Put implementation contracts, detailed behavior flows, repository findings, commands and full acceptance checks in the relevant task packets. Identify tasks by `key` and use `details` to locate their standalone packets.
+
+After creating the task packets, add a `Task matrix` section to `spec.md`. Include one row per task with execution order, task key, complexity and a relative link to its detail file. Follow dependency order. Tasks that can run together share an order number. Keep the matrix consistent with `tasks.yaml` and include it in the 500-word total.
+
+Condense repetition and move supporting detail into task packets until the file fits the limit. Keep agreed scope, decisions and high-level acceptance criteria in `spec.md`. Do not invent requirements or depend on the chat transcript.
 
 ### 4. Create self-contained task packets
 
@@ -79,13 +74,13 @@ Break the specification into minimal, dependency-ordered tasks. Each task file m
 
 Every `<task-key>.md` must contain:
 
-1. **Objective**: one outcome and its requirement identifiers.
+1. **Objective**: one clear outcome.
 2. **Context snapshot**: the problem, domain terms, constraints, decisions, relevant current facts, and assumptions needed for this task.
 3. **Dependencies**: required completed tasks, produced interfaces, and files or states they establish.
 4. **Scope**: included work and explicit exclusions.
 5. **Implementation contract**: required inputs, outputs, state changes, errors, compatibility rules, and integration boundaries.
 6. **Repository guidance**: relevant paths and existing patterns, or an explicit statement that no pattern was found.
-7. **Acceptance checks**: exact observable checks mapped to the specification acceptance criteria.
+7. **Acceptance checks**: exact observable checks for the task outcome.
 8. **Handoff record**: files changed, decisions made, interfaces produced, verification run, and remaining risks. The implementing agent must update it before marking the task done.
 
 Repeat critical constraints in every affected task file. Do not use phrases such as "as described above", "see the previous task", or references to unavailable chat context. A task may link to `spec.md`, but the task packet must copy all information needed to act safely.
@@ -98,35 +93,42 @@ tasks:
     description: Implement one observable outcome
     details: ./task-name.md
     status: open
+    complexity: moderate
     depends: []
-    requirements: [FR-01]
-    acceptance: [AC-01]
 ```
+
+Before writing each task's complexity, use the shared `dx-router` skill on a concise summary of the completed task packet. Include its objective, constraints, affected components and acceptance checks. Set `complexity` to the returned `easy`, `moderate` or `hard` label. Repeat the label and a short explanation in the task packet's context snapshot so a standalone packet preserves it. Classify again if the task scope changes.
+
+If the classifier is unavailable or rejects the input, record `moderate` as a provisional fallback and state the classification failure in the context snapshot and delivery. A fallback label must remain identifiable for later reclassification.
 
 Task rules:
 
 - A task has one clear completion state.
 - Dependencies name only existing task keys.
 - No task depends on an unstated chat decision.
-- The `requirements` and `acceptance` lists must refer to identifiers in `spec.md`.
+- Use `key` and `details` to identify each task and its packet. Keep acceptance checks in the packet.
 - Split a task when independent ownership, verification, or rollback is unclear.
 
 ### 5. Validate before delivery
 
 Verify all of the following:
 
+- `spec.md` records the agreed high-level specification and contains at most 500 words total.
+
 - Every material user request appears in scope, a requirement, or a recorded non-goal.
-- Every requirement has at least one acceptance criterion and task.
-- Every acceptance criterion maps to at least one requirement and task.
+- Task packets collectively cover the agreed scope and contain observable acceptance checks.
 - Each task packet contains all eight required sections.
 - Task packets repeat their required constraints and do not rely on prior chat context.
-- All dependencies, requirement IDs, and acceptance IDs resolve.
-- Open questions have owners and blocked requirements.
+- All dependency keys and detail paths resolve.
+- The task matrix matches task keys, complexity and detail paths in `tasks.yaml`, with dependency-safe execution order.
+- Every task has `complexity: easy`, `complexity: moderate` or `complexity: hard`, repeated in its packet with the reason or provisional fallback status.
+- Open questions have owners and affected scope.
 - The resolved output path is under the main checkout's `.specs/` when the current work is in a worktree.
 
-Run:
+Run the word-count check and task summary:
 
 ```bash
+python3 -c 'from pathlib import Path; import sys; count = len(Path(sys.argv[1]).read_text().split()); print(f"{count}/500 words"); sys.exit(count > 500)' <output-dir>/spec.md
 wtask <output-dir>/tasks.yaml summary
 ```
 

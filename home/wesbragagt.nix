@@ -24,6 +24,8 @@ let
       ./ccflare
       ./claude
       ./codex
+      ./agents/writers/module.nix
+      ./dx-router
       ./omp
       ./programs.nix
       ./tmux
@@ -66,6 +68,7 @@ let
     systemd.user.services.caddy-local-trust = lib.mkIf (!isHeadless) {
       Unit = {
         Description = "Import Caddy local CA into Chromium trust store";
+        ConditionPathExists = "/run/caddy-local-root.crt";
         After = [ "graphical-session.target" ];
         Wants = [ "graphical-session.target" ];
       };

@@ -33,6 +33,14 @@ Turn each task into a check you can verify, then loop until it passes.
 For multi-step work, state a short plan with a check for each step.
 </rule>
 
+<rule name="complexity-routing">
+- Dispatch implementation tasks by their `complexity` label. If the label is missing, use `dx-router`. If classification fails, use `moderate` provisionally and disclose the failure.
+- Map `easy` to `easy-writer` with the label "🟢 easy-writer".
+- Map `moderate` to `moderate-writer` with the label "🟡 moderate-writer".
+- Map `hard` to `hard-writer` with the label "🔴 hard-writer".
+- Show the colored label when dispatching. Use the named agent's configured model and pass the task packet and acceptance checks. If the agent is unavailable or the user requested work in the current session, report the limitation and follow the current session's execution instructions.
+</rule>
+
 <rule name="comments">
 Comments explain why, not what. Keep them to 1 to 3 lines. Write one only when it adds context the code cannot show, such as a business rule or an external constraint.
 </rule>

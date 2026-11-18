@@ -1,0 +1,28 @@
+model = "gpt-6.1-terra"
+model_reasoning_effort = "medium"
+[projects."/home/wesbragagt/dev/stierweb/stack"]
+trust_level = "trusted"
+
+[projects."/home/wesbragagt/dev/work/implentio/stack"]
+trust_level = "trusted"
+
+[projects."/home/wesbragagt/nixos-config"]
+trust_level = "trusted"
+
+[tui]
+screen_reader_detection_done = true
+
+[tui.model_availability_nux]
+gpt-6-astra = 2
+
+[agents.easy-writer]
+description = "Bounded mechanical edits and localized fixes."
+config_file = "agents/easy-writer.toml"
+
+[agents.moderate-writer]
+description = "Familiar multi-step implementation, diagnosis and refactoring."
+config_file = "agents/moderate-writer.toml"
+
+[agents.hard-writer]
+description = "Interacting invariants, concurrency, architecture and partial failures."
+config_file = "agents/hard-writer.toml"

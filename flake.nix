@@ -95,6 +95,7 @@
         # api.nuget.org, which the Nix build sandbox blocks.
         pi-coding-agent = false;
         codex = true;
+        dx-router = false;
         t3code = true;
       };
       machineFeatures = lib.mapAttrs (

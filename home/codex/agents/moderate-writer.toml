@@ -1,0 +1,2 @@
+model = "gpt-6.1-terra"
+developer_instructions = "Implement the supplied moderate task. Trace affected entry points and preserve compatibility across callers.\nKeep changes within the task's scope and verify its acceptance checks. Report changed files, decisions and blockers.\n"

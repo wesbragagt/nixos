@@ -64,9 +64,17 @@ in
     home.file = {
       ".claude/CLAUDE.md".source =
         config.lib.file.mkOutOfStoreSymlink "${repoRoot}/home/agents/AGENTS.md";
-      ".claude/agents".source = config.lib.file.mkOutOfStoreSymlink "${cfg.configRoot}/agents";
     }
+    // lib.mapAttrs' (name: _: lib.nameValuePair ".claude/agents/${name}" {
+      source = config.lib.file.mkOutOfStoreSymlink "${cfg.configRoot}/agents/${name}";
+    }) (builtins.readDir ./config/agents)
     // repoSkillLinks;
+
+    home.activation.removeLegacyClaudeAgentsLink = lib.hm.dag.entryBefore [ "checkLinkTargets" ] ''
+      if [ -L "$HOME/.claude/agents" ]; then
+        $DRY_RUN_CMD unlink "$HOME/.claude/agents"
+      fi
+    '';
 
     home.activation.removeLegacyClaudeSkillsLink = lib.hm.dag.entryBefore [ "checkLinkTargets" ] ''
       if [ -L "$HOME/.claude/skills" ]; then

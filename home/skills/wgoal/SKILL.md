@@ -34,7 +34,7 @@ A task's `details` path is relative to the tasks file's directory, not the curre
 3. Set `round = 1`, `previous_failures = none`.
 4. Run one round. Both modes end when no task is ready, then go to step 5.
    - Default mode: invoke the `code` skill with the Skill tool, args `<path>`. It loads `code`'s instructions into this turn and does not return control by itself. When those instructions say to stop, report, or "allow user to retry", do not end the turn. Go to step 5.
-   - Session mode (`-s`, `--session`): do not invoke `code` and do not dispatch `code-writer-simple` or `code-writer-complex`. Repeat until `wtask <path> ready` is empty. Take the first ready task and run tasks one at a time, never in parallel, because they share this working tree:
+   - Session mode (`-s`, `--session`): do not invoke `code` and do not dispatch `easy-writer`, `moderate-writer` or `hard-writer`. Repeat until `wtask <path> ready` is empty. Take the first ready task and run tasks one at a time, never in parallel, because they share this working tree:
      1. Run `wtask <path> set <key> progress`.
      2. Read the task's detail file, the acceptance criteria it names in `spec.md` (same directory), and the handoff record of each dependency.
      3. Implement the task yourself with the normal edit tools. Follow the repo's conventions. Stay inside the task's scope section.

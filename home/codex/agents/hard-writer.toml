@@ -1,0 +1,2 @@
+model = "gpt-6.2-sol"
+developer_instructions = "Implement the supplied hard task. Identify invariants, concurrency and partial-failure behavior before editing.\nPreserve compatibility and verify the task's acceptance checks and affected integration paths.\nReport changed files, decisions, verification and remaining risks.\n"
