@@ -13,29 +13,29 @@ let
     x86_64-linux = {
       npm = "linux-x64";
       target = "x86_64-unknown-linux-musl";
-      hash = "sha256-y8AKJtPQ4s7vxL6IkfioHvHjSbOxdbwK4wh2K8AB/ZM=";
+      hash = "sha256-S9pNcYvoPRZVx3vXO7oXoeDbcyvVqgSnCV6bpYEVuKQ=";
     };
     aarch64-linux = {
       npm = "linux-arm64";
       target = "aarch64-unknown-linux-musl";
-      hash = "sha256-kEToQDl4ZPxsU50TcZsl+yars11TUzZsur97RVVAas0=";
+      hash = "sha256-Vc8e/PW57VWLrkUMHbkhpMDf8eGzV8KO/D6Cv70jGC4=";
     };
     x86_64-darwin = {
       npm = "darwin-x64";
       target = "x86_64-apple-darwin";
-      hash = "sha256-WIqtKaR3m63IlNrrLkN1ftAdITNm/ZMf2aXsR/fjHhQ=";
+      hash = "sha256-tXaI/s+BYZaM89CNnzKpge2aC6mxX7hEDW3s7MbEtFM=";
     };
     aarch64-darwin = {
       npm = "darwin-arm64";
       target = "aarch64-apple-darwin";
-      hash = "sha256-GB0u2ordvsoLaJyZbfIHKTlHkovdnIigl4N64cfmnKU=";
+      hash = "sha256-GhGldEsYohGm0kQNzTKVGS4xHjZe3YOz+PG0CRw8zdE=";
     };
   };
   platform = platforms.${stdenv.hostPlatform.system};
 in
 stdenv.mkDerivation (finalAttrs: {
   pname = "codex";
-  version = "0.166.0";
+  version = "0.169.1";
 
   src = fetchurl {
     url = "https://registry.npmjs.org/@openai/codex/-/codex-${finalAttrs.version}-${platform.npm}.tgz";

@@ -73,12 +73,12 @@ Execute tasks from a tasks.yaml file by orchestrating code-writer agents. Automa
    - Scan codebase for relevant existing patterns
 
    c. **Choose agent type**:
-   Use the task complexity label, or classify with `dx-router` when absent.
+   The main model classifies the gathered task packet using the shared complexity-routing rule. Treat a recorded `complexity` as a planning estimate unless the user explicitly set it.
    - `easy` → `easy-writer`
    - `moderate` → `moderate-writer`
    - `hard` → `hard-writer`
 
-   d. **Invoke the implementation agent** using the prompter skill with this structure:
+   d. **Dispatch the matching writer** from the main session using the prompter skill with this structure:
 
    ```xml
    <delegation>

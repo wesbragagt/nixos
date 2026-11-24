@@ -139,6 +139,9 @@ an app owns the wheel. Press `q` to leave copy mode; `Escape` only clears the
 selection. Apply with `git add -A && rebuild`, then press `Ctrl-Space`, then `r`
 to reload an existing tmux server.
 
+Press `Ctrl-Space`, then uppercase `A` to close all other windows in the current
+session. The current window stays open; programs in the other windows terminate.
+
 Kitty is installed alongside Foot and uses Maple Mono NL NF at size 14, a
 Tokyo Night palette, 90% background opacity, 8-point padding, and a bar cursor.
 Kitty closes without confirmation, including when child processes are running.

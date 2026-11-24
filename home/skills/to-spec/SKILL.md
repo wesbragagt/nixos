@@ -97,9 +97,7 @@ tasks:
     depends: []
 ```
 
-Before writing each task's complexity, use the shared `dx-router` skill on a concise summary of the completed task packet. Include its objective, constraints, affected components and acceptance checks. Set `complexity` to the returned `easy`, `moderate` or `hard` label. Repeat the label and a short explanation in the task packet's context snapshot so a standalone packet preserves it. Classify again if the task scope changes.
-
-If the classifier is unavailable or rejects the input, record `moderate` as a provisional fallback and state the classification failure in the context snapshot and delivery. A fallback label must remain identifiable for later reclassification.
+Use the main model and the shared complexity-routing rule to assess each completed task packet. Record the `easy`, `moderate` or `hard` planning estimate in `complexity` and include the label and a short reason in the packet's context snapshot. Classify again if the task scope changes.
 
 Task rules:
 
@@ -121,7 +119,7 @@ Verify all of the following:
 - Task packets repeat their required constraints and do not rely on prior chat context.
 - All dependency keys and detail paths resolve.
 - The task matrix matches task keys, complexity and detail paths in `tasks.yaml`, with dependency-safe execution order.
-- Every task has `complexity: easy`, `complexity: moderate` or `complexity: hard`, repeated in its packet with the reason or provisional fallback status.
+- Every task has `complexity: easy`, `complexity: moderate` or `complexity: hard`, repeated in its packet with the reason.
 - Open questions have owners and affected scope.
 - The resolved output path is under the main checkout's `.specs/` when the current work is in a worktree.
 

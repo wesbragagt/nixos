@@ -1,9 +1,12 @@
-{ config, lib, repoRoot, ... }:
+{ config, lib, ... }:
 let
   writers = import ./default.nix;
 in
 {
-  home.file = lib.mkMerge (lib.mapAttrsToList (name: writer: {
+  home.file = lib.mkMerge ([
+    # Codex opens each role file without following a final symlink.
+    { ".codex/writer-configs".source = ../../codex/agents; }
+  ] ++ lib.mapAttrsToList (name: writer: {
     ".claude/agents/${name}.md".text = ''
       ---
       name: ${name}
@@ -14,7 +17,16 @@ in
 
       ${writer.instructions}
     '';
-    ".codex/agents/${name}.toml".source =
-      config.lib.file.mkOutOfStoreSymlink "${repoRoot}/home/codex/agents/${name}.toml";
+    ".omp/agent/agents/${name}.md" = lib.mkIf config.wes.omp.enable {
+      text = ''
+        ---
+        name: ${name}
+        description: ${writer.description}
+        model: ${writer.ompModel}
+        ---
+
+        ${writer.instructions}
+      '';
+    };
   }) writers);
 }

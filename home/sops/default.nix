@@ -7,11 +7,6 @@ let
       export SOPS_AGE_KEY_FILE="${sopsAgeKeyFile}"
     fi
   '';
-  exaKeyExport = ''
-    if [[ -r /run/secrets/exa_api_key ]]; then
-      export EXA_API_KEY="$(< /run/secrets/exa_api_key)"
-    fi
-  '';
   sopsWithYubikey = pkgs.sops.withAgePlugins (plugins: [ plugins.age-plugin-yubikey ]);
   sopsUpdatekeysAll = pkgs.writeShellScriptBin "sops-updatekeys-all" (builtins.readFile ../../scripts/sops-updatekeys.sh);
 in
@@ -37,8 +32,8 @@ in
 
   # Keep these exports before shell integration hooks; zoxide's doctor expects
   # its initialization to remain at the very end of shell startup files.
-  programs.bash.initExtra = lib.mkBefore (sopsShellExport + exaKeyExport);
-  programs.zsh.initContent = lib.mkBefore (sopsShellExport + exaKeyExport);
+  programs.bash.initExtra = lib.mkBefore sopsShellExport;
+  programs.zsh.initContent = lib.mkBefore sopsShellExport;
 
   home.activation.ensureSopsAgeKeyDir = lib.hm.dag.entryAfter ["writeBoundary"] ''
     mkdir -p "$HOME/.config/sops/age"

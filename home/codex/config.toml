@@ -17,12 +17,12 @@ gpt-6-astra = 2
 
 [agents.easy-writer]
 description = "Bounded mechanical edits and localized fixes."
-config_file = "agents/easy-writer.toml"
+config_file = "writer-configs/easy-writer.toml"
 
 [agents.moderate-writer]
 description = "Familiar multi-step implementation, diagnosis and refactoring."
-config_file = "agents/moderate-writer.toml"
+config_file = "writer-configs/moderate-writer.toml"
 
 [agents.hard-writer]
 description = "Interacting invariants, concurrency, architecture and partial failures."
-config_file = "agents/hard-writer.toml"
+config_file = "writer-configs/hard-writer.toml"

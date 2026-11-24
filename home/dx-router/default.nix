@@ -4,7 +4,10 @@ let
   unstable = import inputs.nixpkgs-unstable {
     inherit (pkgs.stdenv.hostPlatform) system;
   };
-  runtime = unstable.llama-cpp.override { vulkanSupport = true; };
+  runtime = unstable.llama-cpp.override {
+    vulkanSupport = true;
+    nodejs_latest = pkgs.nodejs;
+  };
   model = pkgs.fetchurl {
     url = "https://huggingface.co/evalengine/decision-0.8b-gguf/resolve/ce993792ad283053004bf0230b1709ff7351bb24/decision-0.8b-Q8_0.gguf";
     sha256 = "efa1614fe5c7d84acb6b8acdf9fd0dda4a26acf110302732baa573d3332a4fef";

@@ -8,9 +8,6 @@
   ...
 }:
 let
-  sopsHostKeyPath = hostProfile.sopsHostKeyPath or null;
-  useSystemSopsSecrets = sopsHostKeyPath != null;
-  useHomeSopsSecrets = hostProfile.useHomeSopsSecrets or false;
   isDarwin = lib.hasSuffix "-darwin" hostSystem;
   isLinux = lib.hasSuffix "-linux" hostSystem;
   managedHostName =
@@ -34,15 +31,6 @@ let
     # github cli command to open pull request in browser
     got = "gh pr view --web";
   };
-  secretPath =
-    systemPath: homePath:
-    if useSystemSopsSecrets then
-      systemPath
-    else if useHomeSopsSecrets then
-      homePath
-    else
-      "";
-  exaApiKeyPath = secretPath "/run/secrets/exa_api_key" config.sops.secrets.exa_api_key.path;
   shellBootstrap = ''
     # Non-interactive bash (for example Claude/bash tool invocations) does not
     # read ~/.bashrc, so point it at a small BASH_ENV that imports direnv for
@@ -51,10 +39,6 @@ let
 
     if [[ -z "$SSH_AUTH_SOCK" && -S "$HOME/.bitwarden-ssh-agent.sock" ]]; then
       export SSH_AUTH_SOCK="$HOME/.bitwarden-ssh-agent.sock"
-    fi
-
-    if [[ -n "${exaApiKeyPath}" && -f "${exaApiKeyPath}" ]]; then
-      export EXA_API_KEY="$(< "${exaApiKeyPath}")"
     fi
 
 ${lib.optionalString isLinux ''
@@ -122,10 +106,6 @@ ${if isDarwin then ''      sudo darwin-rebuild "$action" --impure --flake ${repo
   '';
 in
 {
-  sops.secrets = lib.optionalAttrs useHomeSopsSecrets {
-    exa_api_key = { };
-  };
-
   home.sessionVariables = {
     W_NOTES = "${config.home.homeDirectory}/p2p/notes-live-sync";
     EDITOR = "nvim";

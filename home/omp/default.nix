@@ -5,13 +5,11 @@ let
     bun-bin-1_4_4 = pkgs.callPackage ../../pkgs/bun-bin-1_4_4 { };
   };
 
-  agentsLink = lib.optionalAttrs (builtins.pathExists ./config/agents) {
-    ".omp/agent/agents".source = config.lib.file.mkOutOfStoreSymlink "${cfg.configRoot}/agents";
-  };
+  agentsLink = lib.optionalAttrs (builtins.pathExists ./config/agents) (lib.mapAttrs' (name: _: lib.nameValuePair ".omp/agent/agents/${name}" {
+    source = config.lib.file.mkOutOfStoreSymlink "${cfg.configRoot}/agents/${name}";
+  }) (builtins.readDir ./config/agents));
 
-  # Expose the shared verifier agent definition to OMP without duplicating it.
-  # Skipped when config/agents exists, since agentsLink already symlinks the
-  # whole ".omp/agent/agents" directory and would collide with a per-file link.
+  # Expose the shared verifier when there is no OMP agents directory.
   verifierAgentLink = lib.optionalAttrs (!builtins.pathExists ./config/agents) {
     ".omp/agent/agents/verifier.md".source =
       config.lib.file.mkOutOfStoreSymlink "${repoRoot}/home/claude/config/agents/verifier.md";

@@ -5,7 +5,7 @@ How I want agents to work and write. These rules apply to every response for the
 <coding>
 
 <rule name="think-before-coding">
-- State your assumptions. If you are uncertain, ask.
+- Make reasonable assumptions when they do not block the task, state them briefly, and continue. Complete all authorized steps and checks without asking me to say "continue." Ask only when essential information cannot be inferred, when the available choices have materially different outcomes, or before a destructive action.
 - If the request has more than one meaning, show the options. Do not pick one silently.
 - If a simpler approach exists, say so. Push back when it is warranted.
 </rule>
@@ -34,7 +34,8 @@ For multi-step work, state a short plan with a check for each step.
 </rule>
 
 <rule name="complexity-routing">
-- Dispatch implementation tasks by their `complexity` label. If the label is missing, use `dx-router`. If classification fails, use `moderate` provisionally and disclose the failure.
+- The main model classifies each implementation task and dispatches the matching writer. Use the objective, constraints, affected components, and acceptance checks. Treat a recorded `complexity` as a planning estimate unless the user explicitly set it.
+- Use `easy` for bounded mechanical changes, `moderate` for familiar multi-step work or diagnosis, and `hard` for interacting invariants, concurrency, or partial failure across components.
 - Map `easy` to `easy-writer` with the label "🟢 easy-writer".
 - Map `moderate` to `moderate-writer` with the label "🟡 moderate-writer".
 - Map `hard` to `hard-writer` with the label "🔴 hard-writer".
